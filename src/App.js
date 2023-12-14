@@ -1,8 +1,9 @@
-import LoginPage from './auth/pages/LoginPage';
+import AppRoutes from "./commons/routes/AppRoutes";
+
 
 function App() {
   return (
-    <LoginPage/>
+    <AppRoutes/>
   );
 }
 
