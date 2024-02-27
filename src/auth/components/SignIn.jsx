@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { 
   Avatar, 
   Button,
@@ -16,6 +17,8 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
 
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -23,6 +26,8 @@ export default function SignIn() {
       username: data.get('username'),
       password: data.get('password'),
     });
+
+    navigate('/menu', { replace: true });
   };
 
   return (

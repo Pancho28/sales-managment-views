@@ -1,14 +1,13 @@
 import { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar ,List ,Typography
-  ,Divider ,IconButton ,Badge ,Container ,Grid ,Paper, AppBar as MuiAppBar } from '@mui/material';
+import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar, List ,Typography,
+  Divider, IconButton, Container, AppBar as MuiAppBar, Tooltip } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './ListItems';
-import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { mainListItems } from './ListItems';
+import MenuRoutes from "../routes/MenuRoutes";
 
 const drawerWidth = 240;
 
@@ -58,8 +57,13 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const defaultTheme = createTheme();
 
+const local = 'Rulo'
+const dolar = 35.51
+
 export default function Dashboard() {
+
   const [open, setOpen] = useState(true);
+  
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -93,12 +97,19 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Dashboard {local}
             </Typography>
             <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
+              <Tooltip title="Precio dolar">
+                <Typography variant="subtitle1">
+                  {dolar}$
+                </Typography>
+              </Tooltip>
+            </IconButton>
+            <IconButton color="inherit" component={RouterLink} to="/">
+              <Tooltip title="Salir">
+                <ExitToAppIcon />
+              </Tooltip>
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -118,8 +129,6 @@ export default function Dashboard() {
           <Divider />
           <List component="nav">
             {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
           </List>
         </Drawer>
         <Box
@@ -135,41 +144,10 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Chart />
-                </Paper>
-              </Grid>
-              {/* Recent Deposits */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Deposits />
-                </Paper>
-              </Grid>
-              {/* Recent Orders */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
-                </Paper>
-              </Grid>
-            </Grid>
+          <Container maxWidth="xlg" sx={{ mt: 4, mb: 4 }}>
+
+            <MenuRoutes/>
+
           </Container>
         </Box>
       </Box>
