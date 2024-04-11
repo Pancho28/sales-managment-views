@@ -30,15 +30,15 @@ export default function Sales(){
     };
 
     const agregarProducto = (productoData) => {
-        const existe = pedido.find((producto) => producto.id === productoData.id)
-        if (existe){
-            pedido.forEach((producto) => {
-                if (producto.id === productoData.id){
-                    producto.cantidad += 1
-                }
-            })
-        } else {
-            pedido.push({...productoData, cantidad: 1})
+        let productoExiste = false;
+        pedido.forEach((producto) => {
+            if (producto.id === productoData.id){
+                productoExiste = true;
+                producto.cantidad += 1
+            }
+        });
+        if (!productoExiste) {
+            pedido.push({...productoData, cantidad: 1});
         }
         calculoTotal();
     }
