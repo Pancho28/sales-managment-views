@@ -12,6 +12,7 @@ import {
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Footer from "../../commons/components/Footer";
+import { enqueueSnackbar } from 'notistack';
 
 const defaultTheme = createTheme();
 
@@ -26,7 +27,7 @@ export default function SignIn() {
       username: data.get('username'),
       password: data.get('password'),
     });
-
+    enqueueSnackbar('Ingresando...',{ variant: 'success' });
     navigate('/menu', { replace: true });
   };
 

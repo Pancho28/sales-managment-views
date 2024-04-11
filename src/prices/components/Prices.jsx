@@ -5,18 +5,18 @@ import DialogAddProduct from './DialogAddProduct';
 
 // ----------------------------------------------------------------------
 
-const productosData = [{id: 1, nombre: 'Perro caliente', precio: 5, fechaCreacion: '10/01/2024', fechaEdicion: '20/01/2024'},
-                      {id: 2, nombre: 'Refresco', precio: 2, fechaCreacion: '10/01/2024', fechaEdicion: '20/01/2024'},
-                      {id: 3, nombre: 'Perro vegano', precio: 3, fechaCreacion: '10/01/2024', fechaEdicion: '20/01/2024'},
-                      {id: 4, nombre: 'Perro Doble', precio: 6, fechaCreacion: '10/01/2024', fechaEdicion: '20/01/2024'},
-                      {id: 5, nombre: 'Papas', precio: 4, fechaCreacion: '10/01/2024', fechaEdicion: '20/01/2024'},
-                      {id: 6, nombre: 'Agua', precio: 3, fechaCreacion: '10/01/2024', fechaEdicion: '20/01/2024'}]
+const productsData = [{id: 1, name: 'Perro caliente', price: 5, creationDate: '10/01/2024', updateDate: '20/01/2024'},
+                      {id: 2, name: 'Refresco', price: 2, creationDate: '10/01/2024', updateDate: '20/01/2024'},
+                      {id: 3, name: 'Perro vegano', price: 3, creationDate: '10/01/2024', updateDate: '20/01/2024'},
+                      {id: 4, name: 'Perro Doble', price: 6, creationDate: '10/01/2024', updateDate: '20/01/2024'},
+                      {id: 5, name: 'Papas', price: 4, creationDate: '10/01/2024', updateDate: '20/01/2024'},
+                      {id: 6, name: 'Agua', price: 3, creationDate: '10/01/2024', updateDate: '20/01/2024'}]
 
 export default function Prices() {
 
   // states
 
-  const [products, setProductos] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const [detailsProduct, setDetailsProduct] = useState({});
 
@@ -24,8 +24,8 @@ export default function Prices() {
 
   const [openAdd, setOpenAdd] = useState(false);
 
-  const openDialogModify = (producto) => { 
-    setDetailsProduct(producto);
+  const openDialogModify = (product) => { 
+    setDetailsProduct(product);
     setOpenModify(!openModify);
   }
 
@@ -34,7 +34,7 @@ export default function Prices() {
   }
 
   useEffect(() => {
-    setProductos(productosData);
+    setProducts(productsData);
   },[]);
 
   return (
@@ -43,22 +43,22 @@ export default function Prices() {
         <Button onClick={openDialogAdd} >Agregar producto</Button>
       </Box>
       <Grid container spacing={2}>
-        {products && products.map((producto) => (
-        <Grid key={producto.id} item xs={4} justifyContent="center" textAlign="center">
+        {products && products.map((product) => (
+        <Grid key={product.id} item xs={4} justifyContent="center" textAlign="center">
           <Card>
-          <CardActionArea onClick={ () => openDialogModify(producto) }>
+          <CardActionArea onClick={ () => openDialogModify(product) }>
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
-                {producto.nombre}
+                {product.name}
               </Typography>
               <Typography gutterBottom variant="h6" component="div">
-                Precio {producto.precio}$
+                Precio {product.price}$
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Fecha de creacion {producto.fechaCreacion}
+                Fecha de creacion {product.creationDate}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Fecha de actualizacion {producto.fechaEdicion}
+                Fecha de actualizacion {product.updateDate}
               </Typography>
             </CardContent>
           </CardActionArea>
@@ -67,8 +67,12 @@ export default function Prices() {
         ))
         }
       </Grid>
-      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} setProductos={setProductos}/>
-      <DialogAddProduct open={openAdd} setOpen={setOpenAdd} products={products} setProductos={setProductos}/>
+      {openModify &&
+      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} setProducts={setProducts}/>
+      }
+      {openAdd &&
+      <DialogAddProduct open={openAdd} setOpen={setOpenAdd} products={products} setProducts={setProducts}/>
+      }
     </>
   );
 }

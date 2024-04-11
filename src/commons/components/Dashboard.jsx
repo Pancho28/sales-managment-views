@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar, List ,Typography,
@@ -8,6 +8,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { mainListItems } from './ListItems';
 import MenuRoutes from "../routes/MenuRoutes";
+import DialogDolar from "./DialogDolar";
+
+export const DolarContext = createContext(0);
 
 const drawerWidth = 240;
 
@@ -58,15 +61,23 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 const local = 'Rulo'
-const dolar = 35.51
+const dolarData = 35.50
 
 export default function Dashboard() {
 
   const [open, setOpen] = useState(true);
+
+  const [dolar, setDolar] = useState(0);
+
+  const [openDialog, setOpenDialog] = useState(false);
   
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  useEffect(() => {
+    setDolar(dolarData);
+  }, []);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -99,7 +110,7 @@ export default function Dashboard() {
             >
               Dashboard {local}
             </Typography>
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
               <Tooltip title="Precio dolar">
                 <Typography variant="subtitle1">
                   {dolar}$
@@ -145,12 +156,15 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="xlg" sx={{ mt: 4, mb: 4 }}>
-
-            <MenuRoutes/>
-
+            <DolarContext.Provider value={{dolar}}>
+              <MenuRoutes/>
+            </DolarContext.Provider>
           </Container>
         </Box>
       </Box>
+      {
+        openDialog && <DialogDolar open={openDialog} setOpen={setOpenDialog} dolar={dolar} setDolar={setDolar}/>
+      }
     </ThemeProvider>
   );
 }

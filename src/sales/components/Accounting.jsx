@@ -9,17 +9,17 @@ import Paper from '@mui/material/Paper';
 
 // ----------------------------------------------------------------------
 
-const CantidadesData = [{ nombre: 'Efectivo dolares', total: 55, tipo: 'dolares'}, 
-                        { nombre: 'Efectivo bolivares', total: 200, tipo: 'bolivares'},
-                        { nombre: 'Transferencias dolares', total: 78, tipo: 'dolares'},
-                        { nombre: 'Tramsferencias bolivares', total: 500, tipo: 'bolivares'},
-                        { nombre: 'Punto de venta', total: 450, tipo: 'bolivares'},]
+const totalsData = [{ name: 'Efectivo dolares', total: 55, type: 'dolares'}, 
+                        { name: 'Efectivo bolivares', total: 200, type: 'bolivares'},
+                        { name: 'Transferencias dolares', total: 78, type: 'dolares'},
+                        { name: 'Tramsferencias bolivares', total: 500, type: 'bolivares'},
+                        { name: 'Punto de venta', total: 450, type: 'bolivares'},]
 
 export default function Accouting() {
 
   // states
 
-  const [cantidades, setCantidades] = useState([]);
+  const [totals, setTotals] = useState([]);
 
   const [totalDolar, setTotalDolar] = useState(0);
 
@@ -33,9 +33,9 @@ export default function Accouting() {
     let totalDolar = 0;
     let totalBs = 0;
     items.forEach((item) => { 
-        if (item.tipo === 'dolares') {
+        if (item.type === 'dolares') {
           totalDolar += item.total;
-        } else if (item.tipo === 'bolivares') {
+        } else if (item.type === 'bolivares') {
           totalBs += item.total;
         }
      })
@@ -43,8 +43,8 @@ export default function Accouting() {
   }
 
   useEffect(() => {
-    setCantidades(CantidadesData);
-    const {totalDolar, totalBs} = calculoTotal(CantidadesData);
+    setTotals(totalsData);
+    const {totalDolar, totalBs} = calculoTotal(totalsData);
     setTotalDolar(totalDolar);
     setTotalBs(totalBs);
   },[]);
@@ -64,10 +64,10 @@ export default function Accouting() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {cantidades && cantidades.map((cantidad) => (
-              <TableRow key={cantidad.nombre}>
-                <TableCell>{cantidad.nombre}</TableCell>
-                <TableCell colSpan={2} align="right">{cantidad.total} {cantidad.tipo === 'bolivares' ? 'Bs' : '$'} </TableCell>
+            {totals && totals.map((total) => (
+              <TableRow key={total.name}>
+                <TableCell>{total.name}</TableCell>
+                <TableCell colSpan={2} align="right">{total.total} {total.type === 'bolivares' ? 'Bs' : '$'} </TableCell>
               </TableRow>
             ))}
             <TableRow>

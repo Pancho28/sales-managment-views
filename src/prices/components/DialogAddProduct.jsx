@@ -1,29 +1,27 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+import {Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle} from '@mui/material';
+import { v4 as uuidv4 } from 'uuid';
+import { enqueueSnackbar } from 'notistack';
 
-export default function DialogAddProduct({open, setOpen, products, setProductos}) {
+export default function DialogAddProduct({open, setOpen, products, setProducts}) {
 
   const handleClose = () => {
     setOpen(!open);
   };
 
   const handleAdd = (newProduct) => {
-    // Colocar validacion de precio negativo
-    const fechaActual = new Date();
-    const dia = fechaActual.getDate();
-    const mes = fechaActual.getMonth() + 1; 
-    // Los meses comienzan en 0, por lo que se suma 1
-    const año = fechaActual.getFullYear();
-    // Concatenar la fecha en el formato deseado
-    const fechaFormateada = `${dia}/${mes}/${año}`;
-    newProduct = {...newProduct, fechaCreacion: fechaFormateada, fechaEdicion: fechaFormateada};
-    setProductos([...products, newProduct]);
+    if (newProduct.price <= 0){
+      enqueueSnackbar('No se puede colocar precios menores a 0$',{ variant: 'warning' });
+      return;
+    }
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1; 
+    const year = currentDate.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;    
+    newProduct = {...newProduct, creationDate: formattedDate, updateDate: formattedDate, id: uuidv4()};
+    setProducts([...products, newProduct]);
     handleClose();
+    enqueueSnackbar('Se ha creado el producto',{ variant: 'success' });
   }
 
   return (
@@ -36,9 +34,9 @@ export default function DialogAddProduct({open, setOpen, products, setProductos}
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries(formData.entries());
-            const nombre = formJson.nombre;
-            const precio = Number(formJson.precio);
-            handleAdd({nombre,precio});
+            const name = formJson.name;
+            const price = Number(formJson.price);
+            handleAdd({name,price});
           },
         }}
       >
@@ -48,8 +46,8 @@ export default function DialogAddProduct({open, setOpen, products, setProductos}
             autoFocus
             required
             margin="dense"
-            id="nombre"
-            name="nombre"
+            id="name"
+            name="name"
             label="Nombre del producto"
             type="text"
             fullWidth
@@ -58,15 +56,15 @@ export default function DialogAddProduct({open, setOpen, products, setProductos}
             autoFocus
             required
             margin="dense"
-            id="precio"
-            name="precio"
+            id="price"
+            name="price"
             label="Precio del producto"
-            type="number"
+            type="float"
             fullWidth
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Cancelar</Button>
           <Button type="submit">Agregar</Button>
         </DialogActions>
       </Dialog>
