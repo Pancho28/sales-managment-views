@@ -1,12 +1,13 @@
 import { useState, useEffect, createContext } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar, List ,Typography,
+import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar ,Typography,
   Divider, IconButton, Container, AppBar as MuiAppBar, Tooltip } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { mainListItems } from './ListItems';
+import ListItems from './ListItems';
+import { enqueueSnackbar } from 'notistack';
 import MenuRoutes from "../routes/MenuRoutes";
 import DialogDolar from "./DialogDolar";
 
@@ -60,14 +61,15 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const defaultTheme = createTheme();
 
-const local = 'Rulo'
-const dolarData = 35.50
-
 export default function Dashboard() {
+
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(true);
 
-  const [dolar, setDolar] = useState(0);
+  const [local, setLocal] = useState('');
+
+  const [dataContext, setDataContext] = useState({});
 
   const [openDialog, setOpenDialog] = useState(false);
   
@@ -75,9 +77,28 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
+  const setDolar = (dolar) => {
+    dataContext.dolar = dolar;
+    const data = JSON.parse(sessionStorage.getItem('data'));
+    data.local.dolar = dolar;
+    sessionStorage.setItem('data', JSON.stringify(data));
+  }
+
   useEffect(() => {
-    setDolar(dolarData);
-  }, []);
+    const data = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')) : null;
+    if (data){
+      setDataContext({
+        dolar: data.local.dolar,
+        userId: data.id,
+        localId: data.local.id,
+        token: data.accessToken
+      });
+      setLocal(data.local.name);
+    }else {
+      navigate('/', { replace: true });
+      enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+    }
+  }, [navigate]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -108,12 +129,12 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard {local}
+              Dashboard {local.toUpperCase()}
             </Typography>
             <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
               <Tooltip title="Precio dolar">
                 <Typography variant="subtitle1">
-                  {dolar}$
+                  {dataContext.dolar}$
                 </Typography>
               </Tooltip>
             </IconButton>
@@ -138,9 +159,7 @@ export default function Dashboard() {
             </IconButton>
           </Toolbar>
           <Divider />
-          <List component="nav">
-            {mainListItems}
-          </List>
+           <ListItems/>
         </Drawer>
         <Box
           component="main"
@@ -156,14 +175,14 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="xlg" sx={{ mt: 4, mb: 4 }}>
-            <DolarContext.Provider value={{dolar}}>
+            <DolarContext.Provider value={{dataContext}}>
               <MenuRoutes/>
             </DolarContext.Provider>
           </Container>
         </Box>
       </Box>
       {
-        openDialog && <DialogDolar open={openDialog} setOpen={setOpenDialog} dolar={dolar} setDolar={setDolar}/>
+        openDialog && <DialogDolar open={openDialog} setOpen={setOpenDialog} dataContext={dataContext} setDolar={setDolar}/>
       }
     </ThemeProvider>
   );

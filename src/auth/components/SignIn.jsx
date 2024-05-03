@@ -1,18 +1,27 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Avatar, 
-  Button,
+  IconButton,
   CssBaseline,
-  TextField,
   Box,
   Typography,
   Container,
-  Paper
+  Paper,
+  Stack,
+  InputAdornment
 } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { LoadingButton } from '@mui/lab';
+import Iconify from "../../commons/components/Iconify";
 import Footer from "../../commons/components/Footer";
 import { enqueueSnackbar } from 'notistack';
+import { useForm } from 'react-hook-form';
+import { FormProvider, RHFTextField } from '../../commons/hook-form';
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { login } from "../services/authentication";
 
 const defaultTheme = createTheme();
 
@@ -20,15 +29,41 @@ export default function SignIn() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
-    });
-    enqueueSnackbar('Ingresando...',{ variant: 'success' });
-    navigate('/menu', { replace: true });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const LoginSchema = Yup.object().shape({
+    username: Yup.string().required('El usuario es requerido'),
+    password: Yup.string().required('La contraseña es requerida'),
+  });
+
+  const defaultValues = {
+    username: '',
+    password: ''
+  };
+
+  const methods = useForm({
+    resolver: yupResolver(LoginSchema),
+    defaultValues,
+  });
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
+
+  const onSubmit = async (values) => {
+    try {
+      const response = await login(values.username, values.password);
+      if ( response.statusCode !== 200 ) {
+        enqueueSnackbar(response.message, { variant: 'error' });
+        return
+      }
+      sessionStorage.setItem('data', JSON.stringify(response.data));
+      enqueueSnackbar('Ingresando...',{ variant: 'success' });
+      navigate('/menu', { replace: true });
+    } catch (error) {
+      enqueueSnackbar('Usuario o contraseña incorrectos',{ variant: 'error' });
+    }
   };
 
   return (
@@ -48,37 +83,31 @@ export default function SignIn() {
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <AccountCircleIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
+            <Typography component="h1" variant="h5" sx={{ m: 2 }}>
               Ingrese a Sales Management
             </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                fullWidth
-                id="username"
-                label="Usuario"
-                name="username"
-                variant="outlined"
-                autoFocus
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                name="password"
-                label="Contraseña"
-                type="password"
-                id="password"
-                variant="outlined"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Ingresar
-              </Button>
-            </Box>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={3}>
+                <RHFTextField name="username" label="Nombre de usuario" />
+                <RHFTextField
+                  name="password"
+                  label="Contraseña"
+                  type={showPassword ? 'text' : 'password'}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                          <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={isSubmitting}>
+                  Ingresar
+                </LoadingButton>
+              </Stack>
+            </FormProvider>
           </Box>
         </Paper>
       </Container>

@@ -154,7 +154,7 @@ export default function Sales(){
                             </Grid>
                             <Grid item xs={3} justifyContent="center" textAlign="center">
                                 <Typography variant="h6" color="text.secondary">
-                                    {Number(total * dolarContext.dolar).toFixed(2)}Bs
+                                    {Number(total * dolarContext.dataContext.dolar).toFixed(2)}Bs
                                 </Typography>
                             </Grid>
                         </Grid>
