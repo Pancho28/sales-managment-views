@@ -1,32 +1,27 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useProducts from "../../commons/hooks/useProducts";
 import { Paper, Grid, Card, CardActionArea, CardContent, Typography, Stack, IconButton, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import DialogPay from "./DialogPay";
 import { enqueueSnackbar } from 'notistack';
 import { DolarContext } from "../../commons/components/Dashboard";
-
-const productsData = [{id:1, name:'producto 1', price: 100}, {id:2, name:'producto 2', price: 200}, 
-                        {id:3, name:'producto 3', price: 300}, {id:4, name:'producto 4', price: 400}, 
-                        {id:5, name:'producto 5', price: 150}, {id:6, name:'producto 6', price: 40}]
-
-const paymentTypesData = [{ id:1, name: 'Dolares' }, { id:2, name:'Bolivares' }, { id:3, name: 'Transferencia' }, { id:4, name: 'Punto de venta' }];
-
-// ----------------------------------------------------------------------
+import { createOrder } from "../services/sales";
 
 export default function Sales(){
 
     const [total, setTotal] = useState(0);
 
-    const [products, setProducts] = useState([]);
-
     const [order, setOrder] = useState([]);
-
-    const [paymentTypes, setPaymentTypes] = useState([]);
 
     const [open, setOpen] = useState(false);
 
     const dolarContext = useContext(DolarContext);
+
+    const { products, paymentTypes } = useProducts();
+
+    const navigate = useNavigate();
 
     const calculateTotal = () => {
         let total = 0;
@@ -69,19 +64,43 @@ export default function Sales(){
       setOpen(!open);
     }
 
-    const createOrder = (paymentType) => {
-        console.log(paymentType);
-        console.log(order);
-        console.log(total);
-        setOrder([]);
-        setTotal(0);
-        enqueueSnackbar('Se ha creado la orden',{ variant: 'success' });
+    const completeOrder = async (payments) => {
+        const items = order.map((item) => {
+            return {   
+                quantity: item.quantity,
+                price: parseFloat(item.price),
+                productId: item.id
+            }
+        });
+        const localId = dolarContext.dataContext.localId;
+        const newOrder = {
+            localId,
+            totalDl: total,
+            totalBs: total * dolarContext.dataContext.dolar,
+            items,
+            payments
+        }
+        try {
+            const token = dolarContext.dataContext.token;
+            const response = await createOrder(token, newOrder);
+            if (response.statusCode === 201){
+                enqueueSnackbar(response.message,{ variant: 'success' });
+                setOrder([]);
+                setTotal(0);
+            }else if(response.statusCode === 401){
+                sessionStorage.clear();
+                navigate('/', { replace: true });
+                enqueueSnackbar(response.message,{ variant: 'warning' });
+                return
+            }else {
+                enqueueSnackbar(response.message, { variant: 'error' });
+                return
+            }
+        } catch (error) {
+            enqueueSnackbar('Error al crear la orden',{ variant: 'error' });
+        }
     }
 
-    useEffect(() => {
-        setProducts(productsData);
-        setPaymentTypes(paymentTypesData);
-    }, []);
 
   return (
     <>
@@ -186,7 +205,7 @@ export default function Sales(){
             </Grid>
         </Grid>
         {
-            open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} createOrder={createOrder}/>
+            open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} completeOrder={completeOrder} total={total}/>
         }
     </>
   );

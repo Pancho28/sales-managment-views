@@ -67,7 +67,7 @@ export default function Totals() {
               <TableCell rowSpan={3} />
               <TableCell colSpan={2}>Total bolivares</TableCell>
               {
-                total && <TableCell align="right">{ccyFormat(total) * dolarContext.dolar} Bs</TableCell>
+                total && <TableCell align="right">{ccyFormat(total) * dolarContext.dataContext.dolar} Bs</TableCell>
               }
             </TableRow>
             <TableRow>
