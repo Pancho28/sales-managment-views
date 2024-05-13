@@ -13,6 +13,18 @@ export default function useProducts() {
 
     const [categories, setCategories] = useState([]);
 
+    const addProduct = (newProduct) => {
+        const newProducts = [...products];
+        newProducts.push(newProduct);
+        setProducts(newProducts);
+        sessionStorage.setItem('products', JSON.stringify(newProducts));
+    }
+
+    const modifyProduct = (newProducts) => {
+        setProducts(newProducts);
+        sessionStorage.setItem('products', JSON.stringify(newProducts));
+    }
+
     useEffect(() => {
         const getData = async () => { 
         try{
@@ -58,6 +70,6 @@ export default function useProducts() {
     getData();
     }, [navigate]);
 
-    return { products, paymentTypes, categories, setProducts };
+    return { products, paymentTypes, categories, modifyProduct, addProduct };
 
 }

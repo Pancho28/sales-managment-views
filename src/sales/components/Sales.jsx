@@ -187,10 +187,10 @@ export default function Sales(){
                 <Grid container spacing={1}>
                     {products && products.map((product) => (
                         <Grid item xs={6} justifyContent="center" textAlign="center" key={product.id}>
-                            <Card sx={{ maxWidth: '100%' }}>
+                            <Card>
                             <CardActionArea onClick={() => addProduct(product)}>
                               <CardContent>
-                                <Typography gutterBottom variant="h5" component="div">
+                                <Typography gutterBottom variant= {product.name.length > 15 ? "h6" : "h5"} component="div">
                                     {product.name}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">

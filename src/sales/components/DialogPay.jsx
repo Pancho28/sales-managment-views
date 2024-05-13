@@ -72,7 +72,10 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
         onClose={handleClose}
         fullWidth
       >
-        <DialogTitle>Forma de pago</DialogTitle>
+        <DialogTitle>
+          Forma de pago <br/>
+          Total {total}$
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
             { payments === 1 ?
@@ -93,7 +96,7 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
             <Box sx={{ m: 2 }}>
                 <Grid container spacing={2}>
 
-                  <Grid item xs={7}>
+                  <Grid item xs={ payments > 1 ? 7 : 12}>
                     <RHFSelect
                       required
                       name="paymenType"

@@ -1,19 +1,9 @@
-import { useState, useEffect } from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import { useState, useEffect, useContext } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { DolarContext } from "../../commons/components/Dashboard";
+import { enqueueSnackbar } from 'notistack';
+import { getSummaryByPaymentType } from "../services/sales";
 
-// ----------------------------------------------------------------------
-
-const totalsData = [{ name: 'Efectivo dolares', total: 55, type: 'dolares'}, 
-                        { name: 'Efectivo bolivares', total: 200, type: 'bolivares'},
-                        { name: 'Transferencias dolares', total: 78, type: 'dolares'},
-                        { name: 'Tramsferencias bolivares', total: 500, type: 'bolivares'},
-                        { name: 'Punto de venta', total: 450, type: 'bolivares'},]
 
 export default function Accouting() {
 
@@ -25,6 +15,8 @@ export default function Accouting() {
 
   const [totalBs, setTotalBs] = useState(0);
 
+  const dolarContext = useContext(DolarContext);
+
   const ccyFormat = (num) => {
     return `${num.toFixed(2)}`;
   }
@@ -33,20 +25,35 @@ export default function Accouting() {
     let totalDolar = 0;
     let totalBs = 0;
     items.forEach((item) => { 
-        if (item.type === 'dolares') {
-          totalDolar += item.total;
-        } else if (item.type === 'bolivares') {
-          totalBs += item.total;
+        if (item.currency === 'Dolares') {
+          totalDolar += Number(item.total);
+        } else if (item.currency === 'Bolivares') {
+          totalBs += Number(item.total);
         }
      })
     return {totalDolar, totalBs};
   }
 
   useEffect(() => {
-    setTotals(totalsData);
-    const {totalDolar, totalBs} = calculoTotal(totalsData);
-    setTotalDolar(totalDolar);
-    setTotalBs(totalBs);
+    const getData = async () => {
+      const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
+      const localId = JSON.parse(sessionStorage.getItem('data')).local.id;
+      const response = await getSummaryByPaymentType(token, localId);
+      if (response.statusCode === 200) {
+        setTotals(response.summary);
+        const {totalDolar, totalBs} = calculoTotal(response.summary);
+        setTotalDolar(totalDolar);
+        setTotalBs(totalBs);
+      }else if (response.statusCode === 401){
+        sessionStorage.clear();
+        enqueueSnackbar(response.message,{ variant: 'warning' });
+        return
+      } else {
+        enqueueSnackbar(response.message,{ variant: 'error' });
+        return
+      }
+    }
+    getData();
   },[]);
 
   return (
@@ -65,22 +72,26 @@ export default function Accouting() {
           </TableHead>
           <TableBody>
             {totals && totals.map((total) => (
-              <TableRow key={total.name}>
-                <TableCell>{total.name}</TableCell>
-                <TableCell colSpan={2} align="right">{total.total} {total.type === 'bolivares' ? 'Bs' : '$'} </TableCell>
+              <TableRow key={total.name+total.currency}>
+                <TableCell>{total.name+' '+total.currency}</TableCell>
+                { total.currency === 'Bolivares' ?
+                <TableCell colSpan={2} align="right">{total.total * dolarContext.dataContext.dolar}Bs </TableCell>
+                :
+                <TableCell colSpan={2} align="right">{total.total}$ </TableCell>
+                }
               </TableRow>
             ))}
             <TableRow>
               <TableCell rowSpan={2} />
-              <TableCell >Total de bolivares</TableCell>
+              <TableCell >Total de dolares</TableCell>
               {
-                totalBs && <TableCell align="right">{ccyFormat(totalBs)} Bs</TableCell>
+                totalDolar ? <TableCell align="right">{ccyFormat(totalDolar)}$</TableCell> : null
               }
             </TableRow>
             <TableRow>
-              <TableCell >Total de dolares</TableCell>
+              <TableCell >Total de bolivares</TableCell>
               {
-                totalDolar && <TableCell align="right">{ccyFormat(totalDolar)}$</TableCell>
+                totalBs ? <TableCell align="right">{ccyFormat(totalBs * dolarContext.dataContext.dolar)}Bs</TableCell> : null
               }
             </TableRow>
           </TableBody>

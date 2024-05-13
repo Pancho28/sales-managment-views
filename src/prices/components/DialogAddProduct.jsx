@@ -9,7 +9,7 @@ import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { createProduct } from "../services/prices";
 
-export default function DialogAddProduct({open, setOpen, products, setProducts, categories}) {
+export default function DialogAddProduct({open, setOpen, addProduct, categories}) {
 
   const dolarContext = useContext(DolarContext);
 
@@ -40,7 +40,6 @@ export default function DialogAddProduct({open, setOpen, products, setProducts, 
   } = methods;
 
   const onSubmit = async (values) => {
-    console.log(values)
     if (values.price <= 0){
       enqueueSnackbar('No se puede colocar precios menores a 0$',{ variant: 'warning' });
       return;
@@ -55,10 +54,11 @@ export default function DialogAddProduct({open, setOpen, products, setProducts, 
       } 
       const token = dolarContext.dataContext.token;
       const response = await createProduct(token, newProduct);
-      console.log(response)
       if (response.statusCode === 201) {
-        newProduct = {...newProduct, creationDate: new Date(), updateDate: null, id: response.productId};
-        setProducts([...products, newProduct]);
+        const category = categories.find(category => category.id === values.category);
+        newProduct = {...newProduct, creationDate: new Date(), updateDate: null, id: response.productId , category: category};
+        delete newProduct.categoryId;
+        addProduct(newProduct);
         handleClose();
         enqueueSnackbar(response.message,{ variant: 'success' });
       }else if (response.statusCode === 401){

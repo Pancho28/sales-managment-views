@@ -6,7 +6,7 @@ import DialogAddProduct from './DialogAddProduct';
 
 export default function Prices() {
 
-  const { products, categories, setProducts } = useProducts();
+  const { products, categories, addProduct, modifyProduct } = useProducts();
 
   const [detailsProduct, setDetailsProduct] = useState({});
 
@@ -57,7 +57,7 @@ export default function Prices() {
                 </>
                 :
                 <>
-                  Product sin actualizaciones
+                  Producto sin actualizaciones
                 </>
                 }
               </Typography>
@@ -69,10 +69,10 @@ export default function Prices() {
         }
       </Grid>
       {openModify &&
-      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} setProducts={setProducts} categories={categories}/>
+      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} modifyProduct={modifyProduct} categories={categories}/>
       }
       {openAdd &&
-      <DialogAddProduct open={openAdd} setOpen={setOpenAdd} products={products} setProducts={setProducts} categories={categories}/>
+      <DialogAddProduct open={openAdd} setOpen={setOpenAdd} addProduct={addProduct} categories={categories}/>
       }
     </>
   );

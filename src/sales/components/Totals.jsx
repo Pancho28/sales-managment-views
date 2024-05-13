@@ -1,15 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { DolarContext } from "../../commons/components/Dashboard";
-
-// ----------------------------------------------------------------------
-
-const productsData = [{ name: 'Perro caliente', price: 5, total: 10}, 
-                        { name: 'Refresco', price: 2, total: 20},
-                        { name: 'Perro vegano', price: 3, total: 5},
-                        { name: 'Perro doble', price: 6, total: 7},
-                        { name: 'Papas', price: 3, total: 8},
-                        { name: 'Agua', price: 3, total: 9}]
+import { enqueueSnackbar } from 'notistack';
+import { getSummaryByPrice } from "../services/sales";
 
 export default function Totals() {
 
@@ -28,14 +21,29 @@ export default function Totals() {
   const calculoTotal = (items) => {
     let total = 0;
     items.forEach((item) => { 
-        total += item.total * item.price
+        total += item.quantity * item.price
      })
     return total;
   }
 
   useEffect(() => {
-    setProducts(productsData);
-    setTotal(calculoTotal(productsData));
+    const getData = async () => {
+      const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
+      const localId = JSON.parse(sessionStorage.getItem('data')).local.id;
+      const response = await getSummaryByPrice(token, localId);
+      if (response.statusCode === 200) {
+        setProducts(response.summary);
+        setTotal(calculoTotal(response.summary));
+      }else if (response.statusCode === 401){
+        sessionStorage.clear();
+        enqueueSnackbar(response.message,{ variant: 'warning' });
+        return
+      } else {
+        enqueueSnackbar(response.message,{ variant: 'error' });
+        return
+      }
+    }
+    getData();
   },[]);
 
   return (
@@ -56,24 +64,24 @@ export default function Totals() {
           </TableHead>
           <TableBody>
             {products && products.map((product) => (
-              <TableRow key={product.name}>
+              <TableRow key={product.name+product.price}>
                 <TableCell>{product.name}</TableCell>
-                <TableCell align="right">{product.total}</TableCell>
+                <TableCell align="right">{product.quantity}</TableCell>
                 <TableCell align="right">{product.price}$</TableCell>
-                <TableCell align="right">{ccyFormat(product.price*product.total)}$</TableCell>
+                <TableCell align="right">{ccyFormat(product.price*product.quantity)}$</TableCell>
               </TableRow>
             ))}
             <TableRow>
               <TableCell rowSpan={3} />
-              <TableCell colSpan={2}>Total bolivares</TableCell>
+              <TableCell colSpan={2}>Total dolares</TableCell>
               {
-                total && <TableCell align="right">{ccyFormat(total) * dolarContext.dataContext.dolar} Bs</TableCell>
+                total ? <TableCell align="right">{ccyFormat(total)}$</TableCell> : null
               }
             </TableRow>
             <TableRow>
-              <TableCell colSpan={2}>Total dolares</TableCell>
+              <TableCell colSpan={2}>Total bolivares</TableCell>
               {
-                total && <TableCell align="right">{ccyFormat(total)}$</TableCell>
+                total ? <TableCell align="right">{ccyFormat(total * dolarContext.dataContext.dolar)} Bs</TableCell> : null 
               }
             </TableRow>
           </TableBody>

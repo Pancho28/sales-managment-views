@@ -1,4 +1,4 @@
-import LoginPage from '../../auth/pages/LoginPage';
+import LoginPage from '../../authorization/pages/LoginPage';
 import DashboardPage from "../pages/DashboardPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';

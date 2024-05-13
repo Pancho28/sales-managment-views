@@ -44,3 +44,25 @@ export async function getCategories(token) {
     const data = await response.json();
     return data;
 }
+
+export async function getSummaryByPrice(token, localId) {
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors'
+    };
+    const response = await fetch(`${API_URL}/products/summaryByPrice/${localId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function getSummaryByPaymentType(token, localId) {
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors'
+    };
+    const response = await fetch(`${API_URL}/orders/summaryPaymentType/${localId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}

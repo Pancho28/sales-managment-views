@@ -9,7 +9,7 @@ import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { updateProduct } from "../services/prices";
 
-export default function DialogModifyPrice({open, setOpen, product, setDetailsProduct, products, setProducts, categories}) {
+export default function DialogModifyPrice({open, setOpen, product, setDetailsProduct, products, modifyProduct, categories}) {
 
   const dolarContext = useContext(DolarContext);
 
@@ -86,7 +86,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
         oldProduct.category = categories.find(category => category.id === values.category);
       }
     });
-    setProducts(products);
+    modifyProduct(products);
     handleClose();
   }
 
