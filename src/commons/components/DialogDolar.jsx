@@ -23,22 +23,22 @@ export default function DialogDolar({open, setOpen, dataContext, setDolar}) {
     try{
       const newDolar = parseFloat(dolar).toFixed(2);
       const response = await updateDolar(dataContext.localId,newDolar,dataContext.token);
-      if(response.statusCode === 401){
-        navigate('/', { replace: true });
-        enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
-        return
-      }else if ( response.statusCode !== 201 ) {
-        enqueueSnackbar(response.message, { variant: 'error' });
-        return
-      }else {
+      if (response.statusCode === 201){
         setDolar(newDolar)
         handleClose();
-        enqueueSnackbar('Se ha modificado la tasa correctamente',{ variant: 'success' });
+        enqueueSnackbar(response.message,{ variant: 'success' });
+      }else if(response.statusCode === 401){
+        sessionStorage.clear();
+        navigate('/', { replace: true });
+        enqueueSnackbar(response.message,{ variant: 'warning' });
+        return
+      }else {
+        enqueueSnackbar(response.message, { variant: 'error' });
+        return
       }
     }catch(error){
         enqueueSnackbar('Error al modificar el cambio',{ variant: 'error' });
     }
-
   }
 
   return (

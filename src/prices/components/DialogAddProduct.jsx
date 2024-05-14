@@ -1,72 +1,124 @@
-import {Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle} from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
+import { useContext } from "react";
+import * as Yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import {Button, Grid, Dialog, Box, DialogContent, DialogTitle} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
+import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
+import { createProduct } from "../services/prices";
 
-export default function DialogAddProduct({open, setOpen, products, setProducts}) {
+export default function DialogAddProduct({open, setOpen, addProduct, categories}) {
+
+  const dolarContext = useContext(DolarContext);
 
   const handleClose = () => {
     setOpen(!open);
   };
 
-  const handleAdd = (newProduct) => {
-    if (newProduct.price <= 0){
+  const RegisterSchema = Yup.object().shape({
+    name: Yup.string().required('El tipo de pago es requerido'),
+    price: Yup.number().required('La cantidad es requerida'),
+    category: Yup.string().required('La categoría es requerida'),
+  });
+
+  const defaultValues = {
+    name: '',
+    price: 0,
+    category: ''
+  };
+  
+  const methods = useForm({
+    resolver: yupResolver(RegisterSchema),
+    defaultValues,
+  });
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
+
+  const onSubmit = async (values) => {
+    if (values.price <= 0){
       enqueueSnackbar('No se puede colocar precios menores a 0$',{ variant: 'warning' });
       return;
+    }  
+    try {
+      const localId = dolarContext.dataContext.localId;
+      let newProduct = {
+        name: values.name,
+        price: parseFloat(values.price),
+        categoryId: values.category,
+        localId
+      } 
+      const token = dolarContext.dataContext.token;
+      const response = await createProduct(token, newProduct);
+      if (response.statusCode === 201) {
+        const category = categories.find(category => category.id === values.category);
+        newProduct = {...newProduct, creationDate: new Date(), updateDate: null, id: response.productId , category: category};
+        delete newProduct.categoryId;
+        addProduct(newProduct);
+        handleClose();
+        enqueueSnackbar(response.message,{ variant: 'success' });
+      }else if (response.statusCode === 401){
+        sessionStorage.clear();
+        enqueueSnackbar(response.message,{ variant: 'warning' });
+        return
+      }else {
+        enqueueSnackbar(response.message, { variant: 'error' });
+        return
+      }
+    }catch(error){
+      enqueueSnackbar('Error al crear el producto',{ variant: 'error' });
     }
-    const currentDate = new Date();
-    const day = currentDate.getDate();
-    const month = currentDate.getMonth() + 1; 
-    const year = currentDate.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;    
-    newProduct = {...newProduct, creationDate: formattedDate, updateDate: formattedDate, id: uuidv4()};
-    setProducts([...products, newProduct]);
-    handleClose();
-    enqueueSnackbar('Se ha creado el producto',{ variant: 'success' });
   }
 
   return (
       <Dialog
         open={open}
         onClose={handleClose}
-        PaperProps={{
-          component: 'form',
-          onSubmit: (event) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries(formData.entries());
-            const name = formJson.name;
-            const price = Number(formJson.price);
-            handleAdd({name,price});
-          },
-        }}
+        fullWidth
       >
         <DialogTitle>Datos del producto</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="name"
-            name="name"
-            label="Nombre del producto"
-            type="text"
-            fullWidth
-          />
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="price"
-            name="price"
-            label="Precio del producto"
-            type="float"
-            fullWidth
-          />
+        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+            <Box sx={{ m: 2 }}>
+                <Grid container spacing={2}>
+
+                  <Grid item xs={12}>
+                    <RHFTextField
+                      required
+                      name="name"
+                      label="Nombre"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <RHFTextField
+                      required
+                      name="price"
+                      label="Precio"
+                      type="number"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                  <RHFSelect
+                    required
+                    name="category"
+                    label="Categoria"
+                    values={categories}
+                  />
+                  </Grid>
+                </Grid>
+            </Box>
+            <Box sx={{ m: 2 }} justifyContent="end" textAlign="end">
+              <Button onClick={handleClose}>Cancelar</Button>
+              <LoadingButton sx={{ml: 1}} size="large" type="submit" variant="contained" loading={isSubmitting}>
+                Crear
+              </LoadingButton>
+            </Box>
+          </FormProvider>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button type="submit">Agregar</Button>
-        </DialogActions>
       </Dialog>
   );
 }

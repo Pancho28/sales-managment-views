@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar ,Typography,
   Divider, IconButton, Container, AppBar as MuiAppBar, Tooltip } from '@mui/material';
@@ -84,6 +84,12 @@ export default function Dashboard() {
     sessionStorage.setItem('data', JSON.stringify(data));
   }
 
+  const logout = () => {
+    sessionStorage.clear();
+    navigate('/', { replace: true });
+    enqueueSnackbar('Sesión cerrada',{ variant: 'success' });
+  }
+
   useEffect(() => {
     const data = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')) : null;
     if (data){
@@ -93,8 +99,9 @@ export default function Dashboard() {
         localId: data.local.id,
         token: data.accessToken
       });
-      setLocal(data.local.name);
+      setLocal(data.local);
     }else {
+      sessionStorage.clear();
       navigate('/', { replace: true });
       enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
     }
@@ -129,7 +136,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard {local.toUpperCase()}
+              Dashboard { local && local.name.toUpperCase()}
             </Typography>
             <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
               <Tooltip title="Precio dolar">
@@ -138,7 +145,7 @@ export default function Dashboard() {
                 </Typography>
               </Tooltip>
             </IconButton>
-            <IconButton color="inherit" component={RouterLink} to="/">
+            <IconButton color="inherit" onClick={logout}>
               <Tooltip title="Salir">
                 <ExitToAppIcon />
               </Tooltip>

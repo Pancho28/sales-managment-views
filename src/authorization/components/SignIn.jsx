@@ -21,7 +21,7 @@ import { useForm } from 'react-hook-form';
 import { FormProvider, RHFTextField } from '../../commons/hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { login } from "../services/authentication";
+import { login } from "../services/authorization";
 
 const defaultTheme = createTheme();
 

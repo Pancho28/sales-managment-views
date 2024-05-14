@@ -1,22 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import useProducts from "../../commons/hooks/useProducts";
 import { CardActionArea, Card, CardContent, Grid, Typography, Button, Box } from '@mui/material';
 import DialogModifyPrice from './DialogModifyPrice';
 import DialogAddProduct from './DialogAddProduct';
 
-// ----------------------------------------------------------------------
-
-const productsData = [{id: 1, name: 'Perro caliente', price: 5, creationDate: '10/01/2024', updateDate: '20/01/2024'},
-                      {id: 2, name: 'Refresco', price: 2, creationDate: '10/01/2024', updateDate: '20/01/2024'},
-                      {id: 3, name: 'Perro vegano', price: 3, creationDate: '10/01/2024', updateDate: '20/01/2024'},
-                      {id: 4, name: 'Perro Doble', price: 6, creationDate: '10/01/2024', updateDate: '20/01/2024'},
-                      {id: 5, name: 'Papas', price: 4, creationDate: '10/01/2024', updateDate: '20/01/2024'},
-                      {id: 6, name: 'Agua', price: 3, creationDate: '10/01/2024', updateDate: '20/01/2024'}]
-
 export default function Prices() {
 
-  // states
-
-  const [products, setProducts] = useState([]);
+  const { products, categories, addProduct, modifyProduct } = useProducts();
 
   const [detailsProduct, setDetailsProduct] = useState({});
 
@@ -33,9 +23,9 @@ export default function Prices() {
     setOpenAdd(!openAdd);
   }
 
-  useEffect(() => {
-    setProducts(productsData);
-  },[]);
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString();
+  }
 
   return (
     <>
@@ -54,11 +44,22 @@ export default function Prices() {
               <Typography gutterBottom variant="h6" component="div">
                 Precio {product.price}$
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Fecha de creacion {product.creationDate}
+              <Typography gutterBottom variant="h6" component="div">
+                Categoria {product.category.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Fecha de actualizacion {product.updateDate}
+                Fecha de creacion {formatDate(product.creationDate)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {product.updateDate ?
+                <>
+                  Fecha de actualizacion {formatDate(product.updateDate)}
+                </>
+                :
+                <>
+                  Producto sin actualizaciones
+                </>
+                }
               </Typography>
             </CardContent>
           </CardActionArea>
@@ -68,10 +69,10 @@ export default function Prices() {
         }
       </Grid>
       {openModify &&
-      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} setProducts={setProducts}/>
+      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} modifyProduct={modifyProduct} categories={categories}/>
       }
       {openAdd &&
-      <DialogAddProduct open={openAdd} setOpen={setOpenAdd} products={products} setProducts={setProducts}/>
+      <DialogAddProduct open={openAdd} setOpen={setOpenAdd} addProduct={addProduct} categories={categories}/>
       }
     </>
   );

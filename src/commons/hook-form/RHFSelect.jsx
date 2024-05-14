@@ -22,7 +22,7 @@ export default function RHFSelect({ name, values, onChangeCourseCode, defaultVal
   };
 
   return (
-    <FormControl>
+    <FormControl fullWidth>
     <Controller
       name={name}
       control={control}
@@ -41,7 +41,7 @@ export default function RHFSelect({ name, values, onChangeCourseCode, defaultVal
               
             >
             {values.map((value,index) =>(
-                <MenuItem key={index} value={value.value} onClick={onChangeSelect}>
+                <MenuItem key={index} value={value.id} onClick={onChangeSelect}>
                     {value.name}
                 </MenuItem>
             ))}
