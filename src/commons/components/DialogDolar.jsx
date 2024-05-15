@@ -65,7 +65,7 @@ export default function DialogDolar({open, setOpen, dataContext, setDolar}) {
             id="dolar"
             name="dolar"
             label="Cambio del dolar"
-            type="float"
+            type="number"
             fullWidth
             defaultValue={dataContext.dolar}
           />
