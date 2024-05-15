@@ -66,6 +66,9 @@ export default function DialogDolar({open, setOpen, dataContext, setDolar}) {
             name="dolar"
             label="Cambio del dolar"
             type="number"
+            inputProps={{
+              step: 0.01, 
+            }}
             fullWidth
             defaultValue={dataContext.dolar}
           />
