@@ -65,7 +65,7 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const [local, setLocal] = useState('');
 
@@ -94,9 +94,9 @@ export default function Dashboard() {
     const data = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')) : null;
     if (data){
       setDataContext({
-        dolar: data.local.dolar,
+        dolar: data.local ? data.local.dolar : 0,
         userId: data.id,
-        localId: data.local.id,
+        localId: data.local ? data.local.id : null,
         token: data.accessToken
       });
       setLocal(data.local);
@@ -141,7 +141,7 @@ export default function Dashboard() {
             <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
               <Tooltip title="Precio dolar">
                 <Typography variant="subtitle1">
-                  {dataContext.dolar}$
+                  {dataContext && dataContext.dolar}$
                 </Typography>
               </Tooltip>
             </IconButton>
