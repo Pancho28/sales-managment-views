@@ -20,7 +20,7 @@ export default function Sales(){
 
     const dolarContext = useContext(DolarContext);
 
-    const { products, paymentTypes, addOrder } = useProducts();
+    const { products, paymentTypes, accessToOrders, addOrder } = useProducts();
 
     const navigate = useNavigate();
 
@@ -87,7 +87,9 @@ export default function Sales(){
             const response = await createOrder(token, newOrder);
             if (response.statusCode === 201){
                 enqueueSnackbar(response.message,{ variant: 'success' });
-                addOrder(response.order);
+                if (accessToOrders){
+                    addOrder(response.order);
+                }
                 setOrder([]);
                 setTotal(0);
             }else if(response.statusCode === 401){
@@ -208,7 +210,8 @@ export default function Sales(){
             </Grid>
         </Grid>
         {
-            open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} completeOrder={completeOrder} total={total}/>
+            open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} 
+                        completeOrder={completeOrder} total={total}/>
         }
     </>
   );

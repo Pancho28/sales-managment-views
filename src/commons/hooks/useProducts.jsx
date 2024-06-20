@@ -16,6 +16,8 @@ export default function useProducts() {
 
     const [orders, setOrders] = useState([]);
 
+    const [accessToOrders, setAccessToOrders] = useState();
+
     const addProduct = (newProduct) => {
         const newProducts = [...products];
         newProducts.push(newProduct);
@@ -52,11 +54,14 @@ export default function useProducts() {
                                     JSON.parse(sessionStorage.getItem('categories')) : null;
             const loadedOrders = JSON.parse(sessionStorage.getItem('orders')) ?
                                     JSON.parse(sessionStorage.getItem('orders')) : null;
+            const accessToOrders = JSON.parse(sessionStorage.getItem('access')) ?
+                                    JSON.parse(sessionStorage.getItem('access')) : null;
             if (loadedProducts && loadedPaymentTypes && loadedCategories && loadedOrders){
                 setProducts(loadedProducts);
                 setPaymentTypes(loadedPaymentTypes);
                 setCategories(loadedCategories);
                 setOrders(loadedOrders);
+                setAccessToOrders(accessToOrders);
                 return;
             }
             const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
@@ -65,7 +70,7 @@ export default function useProducts() {
             const categoriesResponse = await getCategories(token);
             // Si se tiene el acceso a ordenes no entregadas se hace la peticion
             const access = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')).access : null;
-            const accessOrders = access.find(acces => acces.name === AccessNames.OPEN_ORDERS);
+            const accessOrders = access.find(acces => acces.name === AccessNames.OPEN_ORDERS) ? true : false;
             let ordersResponse = { statusCode: 200, orders: [] };
             if (accessOrders){
                 ordersResponse = await getOrdersNotDelivered(token);
@@ -81,10 +86,12 @@ export default function useProducts() {
                 sessionStorage.setItem('paymentTypes', JSON.stringify(normalizedPaymentTypes));
                 sessionStorage.setItem('categories', JSON.stringify(categoriesResponse.categories));
                 sessionStorage.setItem('orders', JSON.stringify(ordersResponse.orders));
+                sessionStorage.setItem('access', JSON.stringify(accessOrders));
                 setProducts(productsResponse.products);
                 setPaymentTypes(normalizedPaymentTypes);
                 setCategories(categoriesResponse.categories);
                 setOrders(ordersResponse.orders);
+                setAccessToOrders(accessOrders);
             }else if(productsResponse.statusCode === 401 || paymentTypesResponse.statusCode === 401 
                     || categoriesResponse.statusCode === 401 || ordersResponse.statusCode === 401){
                 sessionStorage.clear();
@@ -100,6 +107,6 @@ export default function useProducts() {
     getData();
     }, [navigate]);
 
-    return { products, paymentTypes, categories, orders, modifyProduct, addProduct, popOrder, addOrder };
+    return { products, paymentTypes, categories, orders, accessToOrders, modifyProduct, addProduct, popOrder, addOrder };
 
 }

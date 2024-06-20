@@ -22,6 +22,7 @@ import { FormProvider, RHFTextField } from '../../commons/hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { login } from "../services/authorization";
+import moment from "moment";
 
 const defaultTheme = createTheme();
 
@@ -53,7 +54,12 @@ export default function SignIn() {
 
   const onSubmit = async (values) => {
     try {
-      const response = await login(values.username, values.password);
+      const data = {
+        username: values.username,
+        password: values.password,
+        date: moment().format()
+      }
+      const response = await login(data);
       if ( response.statusCode !== 200 ) {
         enqueueSnackbar(response.message, { variant: 'error' });
         return
