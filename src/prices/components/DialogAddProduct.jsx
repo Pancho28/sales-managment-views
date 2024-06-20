@@ -8,6 +8,7 @@ import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { createProduct } from "../services/prices";
+import moment from "moment";
 
 export default function DialogAddProduct({open, setOpen, addProduct, categories}) {
 
@@ -49,6 +50,7 @@ export default function DialogAddProduct({open, setOpen, addProduct, categories}
       let newProduct = {
         name: values.name,
         price: parseFloat(values.price),
+        creationDate: moment().format(),
         categoryId: values.category,
         localId
       } 
@@ -56,7 +58,7 @@ export default function DialogAddProduct({open, setOpen, addProduct, categories}
       const response = await createProduct(token, newProduct);
       if (response.statusCode === 201) {
         const category = categories.find(category => category.id === values.category);
-        newProduct = {...newProduct, creationDate: new Date(), updateDate: null, id: response.productId , category: category};
+        newProduct = {...newProduct, updateDate: null, id: response.productId , category: category};
         delete newProduct.categoryId;
         addProduct(newProduct);
         handleClose();

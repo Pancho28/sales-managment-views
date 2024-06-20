@@ -45,24 +45,49 @@ export async function getCategories(token) {
     return data;
 }
 
-export async function getSummaryByPrice(token, localId) {
+export async function getSummaryByPrice(token, localId, date) {
     const requestOptions = {
-      method: 'GET',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      mode: 'cors'
+      mode: 'cors',
+      body: JSON.stringify(date)
     };
     const response = await fetch(`${API_URL}/products/summaryByPrice/${localId}`, requestOptions);
     const data = await response.json();
     return data;
 }
 
-export async function getSummaryByPaymentType(token, localId) {
+export async function getSummaryByPaymentType(token, localId, date) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors',
+      body: JSON.stringify(date)
+    };
+    const response = await fetch(`${API_URL}/orders/summaryPaymentType/${localId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function getOrdersNotDelivered(token) {
     const requestOptions = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       mode: 'cors'
     };
-    const response = await fetch(`${API_URL}/orders/summaryPaymentType/${localId}`, requestOptions);
+    const response = await fetch(`${API_URL}/orders/notdelivered/all`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function deliverOrder(token, orderId, date) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors',
+      body: JSON.stringify(date)
+    };
+    const response = await fetch(`${API_URL}/orders/notdelivered/${orderId}`, requestOptions);
     const data = await response.json();
     return data;
 }

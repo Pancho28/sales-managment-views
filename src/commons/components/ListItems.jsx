@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import { AccessNames } from "../helpers/enum.ts";
 
 export default function ListItems() {
@@ -39,6 +40,14 @@ return(
         </ListItemIcon>
         <ListItemText primary="Precios" />
       </ListItemButton>
+      { accessList && accessList.includes(AccessNames.OPEN_ORDERS) &&
+      <ListItemButton component={RouterLink} to="/menu/orders">
+        <ListItemIcon>
+          <PendingActionsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Ordenes" />
+      </ListItemButton>
+      }
       { accessList && accessList.includes(AccessNames.TOTALS) &&
       <ListItemButton component={RouterLink} to="/menu/totales">
         <ListItemIcon>

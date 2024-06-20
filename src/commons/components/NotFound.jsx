@@ -1,11 +1,11 @@
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
+import { Button, Container, Typography, Box } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export default function NotFoundView() {
+
+  const navigate = useNavigate();
 
   return (
     <>
@@ -32,8 +32,8 @@ export default function NotFoundView() {
             ¿Quizá ha escrito mal la URL? Asegúrese de revisar su ortografía.
           </Typography>
 
-          <Button href="/" size="large" variant="contained">
-            Ir a Inicio
+          <Button size="large" variant="contained" onClick={()=> navigate('/menu', { replace: true })}>
+            Ir al menu principal
           </Button>
         </Box>
       </Container>

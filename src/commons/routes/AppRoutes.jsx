@@ -1,6 +1,5 @@
 import LoginPage from '../../authorization/pages/LoginPage';
-import DashboardPage from "../pages/DashboardPage";
-import NotFoundPage from "../pages/NotFoundPage";
+import { DashboardPage, NotFoundPage } from "../pages";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // ----------------------------------------------------------------------

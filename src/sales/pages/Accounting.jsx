@@ -3,9 +3,10 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { getSummaryByPaymentType } from "../services/sales";
+import moment from 'moment';
 
 
-export default function Accouting() {
+export default function Accounting() {
 
   // states
 
@@ -38,7 +39,8 @@ export default function Accouting() {
     const getData = async () => {
       const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
       const localId = JSON.parse(sessionStorage.getItem('data')).local.id;
-      const response = await getSummaryByPaymentType(token, localId);
+      const data = {date: moment().format()};
+      const response = await getSummaryByPaymentType(token, localId,data);
       if (response.statusCode === 200) {
         setTotals(response.summary);
         const {totalDolar, totalBs} = calculoTotal(response.summary);

@@ -4,10 +4,11 @@ import useProducts from "../../commons/hooks/useProducts";
 import { Paper, Grid, Card, CardActionArea, CardContent, Typography, Stack, IconButton, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import DialogPay from "./DialogPay";
+import { DialogPay } from "../components";
 import { enqueueSnackbar } from 'notistack';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { createOrder } from "../services/sales";
+import moment from 'moment';
 
 export default function Sales(){
 
@@ -19,7 +20,7 @@ export default function Sales(){
 
     const dolarContext = useContext(DolarContext);
 
-    const { products, paymentTypes } = useProducts();
+    const { products, paymentTypes, accessToOrders, addOrder } = useProducts();
 
     const navigate = useNavigate();
 
@@ -74,6 +75,7 @@ export default function Sales(){
         });
         const localId = dolarContext.dataContext.localId;
         const newOrder = {
+            creationDate: moment().format(),
             localId,
             totalDl: total,
             totalBs: total * dolarContext.dataContext.dolar,
@@ -85,6 +87,9 @@ export default function Sales(){
             const response = await createOrder(token, newOrder);
             if (response.statusCode === 201){
                 enqueueSnackbar(response.message,{ variant: 'success' });
+                if (accessToOrders){
+                    addOrder(response.order);
+                }
                 setOrder([]);
                 setTotal(0);
             }else if(response.statusCode === 401){
@@ -205,7 +210,8 @@ export default function Sales(){
             </Grid>
         </Grid>
         {
-            open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} completeOrder={completeOrder} total={total}/>
+            open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} 
+                        completeOrder={completeOrder} total={total}/>
         }
     </>
   );

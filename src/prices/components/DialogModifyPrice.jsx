@@ -8,6 +8,7 @@ import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { updateProduct } from "../services/prices";
+import moment from "moment";
 
 export default function DialogModifyPrice({open, setOpen, product, setDetailsProduct, products, modifyProduct, categories}) {
 
@@ -47,6 +48,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
       productId: product.id,
       name: values.name === product.name ? null : values.name,
       price: parseFloat(values.price) === parseFloat(product.price) ? null : values.price,
+      updateDate: moment().format(),
       categoryId: values.category === product.category.id ? null : values.category,
     }
     try {
@@ -82,7 +84,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
       if (oldProduct.id === product.id){
         oldProduct.name = values.name;
         oldProduct.price = newPrice;
-        oldProduct.updateDate = new Date();
+        oldProduct.updateDate = moment().format();
         oldProduct.category = categories.find(category => category.id === values.category);
       }
     });
