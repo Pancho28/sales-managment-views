@@ -1,0 +1,82 @@
+import useProducts from "../../commons/hooks/useProducts";
+import { Typography, Paper, Stack, Accordion, AccordionActions, AccordionSummary, AccordionDetails, Button, List,
+  ListItem, ListItemIcon, ListItemText, Box} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import moment from 'moment';
+import { enqueueSnackbar } from 'notistack';
+import { deliverOrder } from "../services/sales";
+
+
+export default function Orders() {
+
+  const { orders, popOrder } = useProducts();
+
+  const deliveryOrder = async (orderId) => {
+    const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
+    try {
+      const data = {date: moment().format()} ;
+      const response = await deliverOrder(token, orderId, data);
+      if (response.statusCode === 201) {
+        popOrder(orderId);
+        enqueueSnackbar(response.message,{ variant: 'success' });
+      }else if (response.statusCode === 401){
+        sessionStorage.clear();
+        enqueueSnackbar(response.message,{ variant: 'warning' });
+        return
+      }else {
+        enqueueSnackbar(response.message, { variant: 'error' });
+        return
+      }
+    }
+    catch (error) {
+      enqueueSnackbar('Error al entregar orden',{ variant: 'error' });
+    }
+  }
+
+  return (
+    <Paper>
+      <Stack>
+        <Typography gutterBottom variant="h4" p={2}>Ordenes pendientes: {orders.length}</Typography>
+        { orders && orders.length > 0 ? orders.map((order) => (
+          <Accordion key={order.id}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">
+                Orden pendiente {moment(order.creationDate).format('h:mm a')}  
+              </Typography>
+              <AccessTimeIcon color='primary' fontSize='inherit' /> 
+            </AccordionSummary>
+            <AccordionDetails>
+              <List>
+                  {order.orderItem.map((item) => (
+                    <ListItem key={item.id}>
+                      <ListItemIcon>
+                        <ShoppingCartCheckoutIcon color='primary'/>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.quantity+' '+item.product.name}
+                      />
+                    </ListItem>
+                  ))}
+              </List>
+              <Typography mt={3} ariant="subtitle2">Pagado {order.totalDl}$ | {order.totalBs}Bs</Typography>
+            </AccordionDetails>
+            <AccordionActions>
+              <Button size="large" onClick={() => deliveryOrder(order.id)}>Entregar pedido</Button>
+            </AccordionActions>
+          </Accordion>
+        ))
+        :
+        <Box justifyContent="center" textAlign="center">
+            <Typography p={2} variant="h4">
+            Sin ordenes pendientes
+            </Typography>
+            <AddShoppingCartIcon fontSize='large'/>
+        </Box>        
+      }
+      </Stack>
+    </Paper>
+  );
+}

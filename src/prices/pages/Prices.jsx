@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import useProducts from "../../commons/hooks/useProducts";
 import { CardActionArea, Card, CardContent, Grid, Typography, Button, Box } from '@mui/material';
-import DialogModifyPrice from './DialogModifyPrice';
-import DialogAddProduct from './DialogAddProduct';
+import { DialogModifyPrice, DialogAddProduct } from '../components';
 
 export default function Prices() {
 

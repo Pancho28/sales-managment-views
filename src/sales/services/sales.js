@@ -66,3 +66,26 @@ export async function getSummaryByPaymentType(token, localId) {
     const data = await response.json();
     return data;
 }
+
+export async function getOrdersNotDelivered(token) {
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors'
+    };
+    const response = await fetch(`${API_URL}/orders/notdelivered/all`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function deliverOrder(token, orderId, date) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors',
+      body: JSON.stringify(date)
+    };
+    const response = await fetch(`${API_URL}/orders/notdelivered/${orderId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}

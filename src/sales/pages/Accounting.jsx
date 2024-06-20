@@ -5,7 +5,7 @@ import { enqueueSnackbar } from 'notistack';
 import { getSummaryByPaymentType } from "../services/sales";
 
 
-export default function Accouting() {
+export default function Accounting() {
 
   // states
 
