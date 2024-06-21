@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { getSummaryByPaymentType } from "../services/sales";
-import moment from 'moment';
+import moment from "moment-timezone";
 
 
 export default function Accounting() {
@@ -39,7 +39,8 @@ export default function Accounting() {
     const getData = async () => {
       const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
       const localId = JSON.parse(sessionStorage.getItem('data')).local.id;
-      const data = {date: moment().format()};
+      const tz = JSON.parse(sessionStorage.getItem('data')).tz;
+      const data = {date: moment().tz(tz).format()};
       const response = await getSummaryByPaymentType(token, localId,data);
       if (response.statusCode === 200) {
         setTotals(response.summary);

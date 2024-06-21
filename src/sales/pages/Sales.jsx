@@ -8,7 +8,7 @@ import { DialogPay } from "../components";
 import { enqueueSnackbar } from 'notistack';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { createOrder } from "../services/sales";
-import moment from 'moment';
+import moment from "moment-timezone";
 
 export default function Sales(){
 
@@ -74,8 +74,9 @@ export default function Sales(){
             }
         });
         const localId = dolarContext.dataContext.localId;
+        const tz = JSON.parse(sessionStorage.getItem('data')).tz;
         const newOrder = {
-            creationDate: moment().format(),
+            creationDate: moment().tz(tz).format(),
             localId,
             totalDl: total,
             totalBs: total * dolarContext.dataContext.dolar,

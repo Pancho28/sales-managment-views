@@ -8,7 +8,7 @@ import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { updateProduct } from "../services/prices";
-import moment from "moment";
+import moment from "moment-timezone";
 
 export default function DialogModifyPrice({open, setOpen, product, setDetailsProduct, products, modifyProduct, categories}) {
 
@@ -44,11 +44,12 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
   const modificationProduct = async (values) => {
     const token = dolarContext.dataContext.token;
     const localId = dolarContext.dataContext.localId;
+    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
     const newProduct = {
       productId: product.id,
       name: values.name === product.name ? null : values.name,
       price: parseFloat(values.price) === parseFloat(product.price) ? null : values.price,
-      updateDate: moment().format(),
+      updateDate: moment().tz(tz).format(),
       categoryId: values.category === product.category.id ? null : values.category,
     }
     try {
@@ -80,11 +81,12 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
       return;
     }
     await modificationProduct(values);
+    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
     products.forEach((oldProduct) => {
       if (oldProduct.id === product.id){
         oldProduct.name = values.name;
         oldProduct.price = newPrice;
-        oldProduct.updateDate = moment().format();
+        oldProduct.updateDate = moment().tz(tz).format();
         oldProduct.category = categories.find(category => category.id === values.category);
       }
     });
