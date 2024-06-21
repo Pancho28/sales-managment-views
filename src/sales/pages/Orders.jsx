@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import moment from 'moment';
+import moment from "moment-timezone";
 import { enqueueSnackbar } from 'notistack';
 import { deliverOrder } from "../services/sales";
 
@@ -16,8 +16,9 @@ export default function Orders() {
 
   const deliveryOrder = async (orderId) => {
     const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
+    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
     try {
-      const data = {date: moment().format()} ;
+      const data = {date: moment().tz(tz).format()} ;
       const response = await deliverOrder(token, orderId, data);
       if (response.statusCode === 201) {
         popOrder(orderId);

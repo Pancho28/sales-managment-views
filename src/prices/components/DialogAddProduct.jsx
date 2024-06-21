@@ -8,7 +8,7 @@ import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { createProduct } from "../services/prices";
-import moment from "moment";
+import moment from "moment-timezone";
 
 export default function DialogAddProduct({open, setOpen, addProduct, categories}) {
 
@@ -47,10 +47,11 @@ export default function DialogAddProduct({open, setOpen, addProduct, categories}
     }  
     try {
       const localId = dolarContext.dataContext.localId;
+      const tz = JSON.parse(sessionStorage.getItem('data')).tz;
       let newProduct = {
         name: values.name,
         price: parseFloat(values.price),
-        creationDate: moment().format(),
+        creationDate: moment().tz(tz).format(),
         categoryId: values.category,
         localId
       } 
