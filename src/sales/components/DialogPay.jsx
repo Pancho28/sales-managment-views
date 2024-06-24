@@ -54,13 +54,20 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
     if (payments === 1){
       payment = [{paymentTypeId: values.paymenType, amount: total}]
     }else {
-      if (values.amount + values.amount2 === total){
-      payment = [{paymentTypeId: values.paymenType, amount: values.amount},
-                 {paymentTypeId: values.paymenType2, amount: values.amount2}]
-      }else{
+      if (values.amount <= 0 || values.amount2 <= 0){
+        enqueueSnackbar('La cantidad debe ser mayor a 0',{ variant: 'warning' });
+        return;
+      }
+      if (values.amount + values.amount2 !== total){
         enqueueSnackbar('La suma de los pagos no es igual al total',{ variant: 'warning' });
         return;
       }
+      if (values.paymenType === values.paymenType2){
+        enqueueSnackbar('Los tipos de pago no pueden ser iguales',{ variant: 'warning' });
+        return;
+      }
+      payment = [{paymentTypeId: values.paymenType, amount: values.amount},
+                 {paymentTypeId: values.paymenType2, amount: values.amount2}]
     }
     completeOrder(payment)
     handleClose();
