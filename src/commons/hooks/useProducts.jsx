@@ -77,18 +77,13 @@ export default function useProducts() {
             }
             if (productsResponse.statusCode === 200 && paymentTypesResponse.statusCode === 200 
                     && categoriesResponse.statusCode === 200 && ordersResponse.statusCode === 200){
-                const normalizedPaymentTypes = paymentTypesResponse.paymentTypes.map(paymentType => {
-                    paymentType.name = paymentType.name + ' ' + paymentType.currency;
-                    delete paymentType.currency;
-                    return paymentType;
-                });
                 sessionStorage.setItem('products', JSON.stringify(productsResponse.products));
-                sessionStorage.setItem('paymentTypes', JSON.stringify(normalizedPaymentTypes));
+                sessionStorage.setItem('paymentTypes', JSON.stringify(paymentTypesResponse.paymentTypes));
                 sessionStorage.setItem('categories', JSON.stringify(categoriesResponse.categories));
                 sessionStorage.setItem('orders', JSON.stringify(ordersResponse.orders));
                 sessionStorage.setItem('access', JSON.stringify(accessOrders));
                 setProducts(productsResponse.products);
-                setPaymentTypes(normalizedPaymentTypes);
+                setPaymentTypes(paymentTypesResponse.paymentTypes);
                 setCategories(categoriesResponse.categories);
                 setOrders(ordersResponse.orders);
                 setAccessToOrders(accessOrders);
