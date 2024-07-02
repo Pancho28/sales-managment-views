@@ -65,7 +65,7 @@ export default function Sales(){
       setOpen(!open);
     }
 
-    const completeOrder = async (payments) => {
+    const completeOrder = async (payments,delivered) => {
         const items = order.map((item) => {
             return {   
                 quantity: item.quantity,
@@ -80,6 +80,7 @@ export default function Sales(){
             localId,
             totalDl: total,
             totalBs: total * dolarContext.dataContext.dolar,
+            delivered,
             items,
             payments
         }
@@ -88,7 +89,7 @@ export default function Sales(){
             const response = await createOrder(token, newOrder);
             if (response.statusCode === 201){
                 enqueueSnackbar(response.message,{ variant: 'success' });
-                if (accessToOrders){
+                if (accessToOrders && !delivered){
                     addOrder(response.order);
                 }
                 setOrder([]);
@@ -212,7 +213,7 @@ export default function Sales(){
         </Grid>
         {
             open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} 
-                        completeOrder={completeOrder} total={total}/>
+                        completeOrder={completeOrder} total={total} accessToOrders={accessToOrders}/>
         }
     </>
   );

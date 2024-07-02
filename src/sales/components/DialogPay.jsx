@@ -6,16 +6,17 @@ import {Button, Dialog, DialogContent, Grid, DialogTitle, Box, Tooltip, IconButt
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { LoadingButton } from '@mui/lab';
-import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
+import { FormProvider, RHFTextField, RHFSelect, RHFCheckbox } from '../../commons/hook-form';
 import { enqueueSnackbar } from 'notistack';
 
-export default function DialogPay({open, setOpen, paymentTypes, completeOrder, total}) {
+export default function DialogPay({open, setOpen, paymentTypes, completeOrder, total, accessToOrders}) {
 
   const [payments, setPayments] = useState(1);
 
   const RegisterSchema = Yup.object().shape({
     paymenType: Yup.string().required('El tipo de pago es requerido'),
     amount: Yup.number().required('La cantidad es requerida'),
+    delivered: Yup.boolean().optional(),
     paymenType2: Yup.string().optional(),
     amount2: Yup.number().optional(),
   });
@@ -23,6 +24,7 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
   const defaultValues = {
     paymenType: '',
     amount: 0,
+    delivered: false,
     paymenType2: '',
     amount2: 0
   };
@@ -69,7 +71,7 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
       payment = [{paymentTypeId: values.paymenType, amount: values.amount},
                  {paymentTypeId: values.paymenType2, amount: values.amount2}]
     }
-    completeOrder(payment)
+    completeOrder(payment,values.delivered)
     handleClose();
   }
 
@@ -140,6 +142,13 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
                     </Grid>
                   </>
                   }
+
+                  { accessToOrders &&
+                  <Grid item xs={12}>
+                    <RHFCheckbox name="delivered" label="Orden entregada"/>
+                  </Grid>
+                  }
+
                 </Grid>
             </Box>
             <Box sx={{ m: 2 }} justifyContent="end" textAlign="end">
