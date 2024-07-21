@@ -1,4 +1,5 @@
-import useProducts from "../../commons/hooks/useProducts";
+import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Typography, Paper, Stack, Accordion, AccordionActions, AccordionSummary, AccordionDetails, Button, List,
   ListItem, ListItemIcon, ListItemText, Box} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -7,12 +8,14 @@ import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import moment from "moment-timezone";
 import { enqueueSnackbar } from 'notistack';
-import { deliverOrder } from "../services/sales";
+import { deliverOrder, getOrdersNotDelivered } from "../services/sales";
 
 
 export default function Orders() {
 
-  const { orders, popOrder } = useProducts();
+  const navigate = useNavigate();
+
+  const [orders, setOrders] = useState([]);
 
   const deliveryOrder = async (orderId) => {
     const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
@@ -21,7 +24,8 @@ export default function Orders() {
       const data = {date: moment().tz(tz).format()} ;
       const response = await deliverOrder(token, orderId, data);
       if (response.statusCode === 201) {
-        popOrder(orderId);
+        const newOrders = orders.filter(order => order.id !== orderId);
+        setOrders(newOrders);
         enqueueSnackbar(response.message,{ variant: 'success' });
       }else if (response.statusCode === 401){
         sessionStorage.clear();
@@ -36,6 +40,28 @@ export default function Orders() {
       enqueueSnackbar('Error al entregar orden',{ variant: 'error' });
     }
   }
+
+  useEffect(() => {
+    const getOrders = async () => { 
+      try{
+        const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
+        const ordersResponse = await getOrdersNotDelivered(token);
+        if (ordersResponse.statusCode === 200){
+          setOrders(ordersResponse.orders);
+        }else if(ordersResponse.statusCode === 401){
+          sessionStorage.clear();
+          navigate('/', { replace: true });
+          enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+        }else{
+          enqueueSnackbar(ordersResponse.message,{ variant: 'error' });
+        }
+      }
+      catch (error) {
+        enqueueSnackbar('Error al obtener las ordenes',{ variant: 'error' });
+      }
+    }
+    getOrders();
+  }, [navigate]);
 
   return (
     <Paper>

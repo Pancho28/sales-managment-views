@@ -1,7 +1,9 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useProducts from "../../commons/hooks/useProducts";
-import { Paper, Grid, Card, CardActionArea, CardContent, Typography, Stack, IconButton, Button } from '@mui/material';
+import { Paper, Grid, Card, CardActionArea, CardContent, Typography, Stack, IconButton, Button,
+    Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { DialogPay } from "../components";
@@ -20,7 +22,7 @@ export default function Sales(){
 
     const dolarContext = useContext(DolarContext);
 
-    const { products, paymentTypes, accessToOrders, addOrder } = useProducts();
+    const { products, paymentTypes, accessToOrders } = useProducts();
 
     const navigate = useNavigate();
 
@@ -89,9 +91,6 @@ export default function Sales(){
             const response = await createOrder(token, newOrder);
             if (response.statusCode === 201){
                 enqueueSnackbar(response.message,{ variant: 'success' });
-                if (accessToOrders && !delivered){
-                    addOrder(response.order);
-                }
                 setOrder([]);
                 setTotal(0);
             }else if(response.statusCode === 401){
@@ -191,24 +190,40 @@ export default function Sales(){
                 </Stack>
             </Grid>
             <Grid item xs={5}>
-                <Grid container spacing={1}>
-                    {products && products.map((product) => (
-                        <Grid item xs={6} justifyContent="center" textAlign="center" key={product.id}>
-                            <Card>
-                            <CardActionArea onClick={() => addProduct(product)}>
-                              <CardContent>
-                                <Typography gutterBottom variant= {product.name.length > 15 ? "h6" : "h5"} component="div">
-                                    {product.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {product.price}$
-                                </Typography>
-                              </CardContent>
-                            </CardActionArea>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                {
+                    products && products.map((category) => (
+                        category.product.length > 0 &&
+                            <Accordion key={category.id}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                              <Typography variant="h6">
+                                {category.name}
+                              </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Grid container spacing={1}>
+                                {
+                                    category.product.map((product)=>(
+                                        <Grid item xs={6} justifyContent="center" textAlign="center" key={product.id}>
+                                            <Card>
+                                            <CardActionArea onClick={() => addProduct(product)}>
+                                              <CardContent>
+                                                <Typography gutterBottom variant= {product.name.length > 15 ? "h6" : "h5"} component="div">
+                                                    {product.name}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {product.price}$
+                                                </Typography>
+                                              </CardContent>
+                                            </CardActionArea>
+                                            </Card>
+                                        </Grid>
+                                    ))
+                                }
+                                </Grid>
+                            </AccordionDetails>
+                        </Accordion>
+                    ))
+                }                
             </Grid>
         </Grid>
         {

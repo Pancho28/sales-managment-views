@@ -10,13 +10,13 @@ import { enqueueSnackbar } from 'notistack';
 import { updateProduct } from "../services/prices";
 import moment from "moment-timezone";
 
-export default function DialogModifyPrice({open, setOpen, product, setDetailsProduct, products, modifyProduct, categories}) {
+export default function DialogModifyPrice({open, setOpen, category, product, setDetailsNull, products, modifyProduct, categories}) {
 
   const dolarContext = useContext(DolarContext);
 
   const handleClose = () => {
     setOpen(!open);
-    setDetailsProduct({})
+    setDetailsNull()
   };
 
   const RegisterSchema = Yup.object().shape({
@@ -28,7 +28,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
   const defaultValues = {
     name: product.name,
     price: product.price,
-    category: product.category.id
+    category: category.id
   };
   
   const methods = useForm({
@@ -50,7 +50,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
       name: values.name === product.name ? null : values.name,
       price: parseFloat(values.price) === parseFloat(product.price) ? null : values.price,
       updateDate: moment().tz(tz).format(),
-      categoryId: values.category === product.category.id ? null : values.category,
+      categoryId: values.category === category.id ? null : values.category,
     }
     try {
       const response = await updateProduct(token, newProduct, localId);
@@ -71,7 +71,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
 
   const onSubmit = async (values) => {
     if (values.name === product.name && parseFloat(values.price) === parseFloat(product.price) 
-                                    && values.category === product.category.id){ 
+                                    && values.category === category.id){ 
       enqueueSnackbar('No se ha modificado el producto',{ variant: 'warning' });
       return;
     }
@@ -81,16 +81,7 @@ export default function DialogModifyPrice({open, setOpen, product, setDetailsPro
       return;
     }
     await modificationProduct(values);
-    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
-    products.forEach((oldProduct) => {
-      if (oldProduct.id === product.id){
-        oldProduct.name = values.name;
-        oldProduct.price = newPrice;
-        oldProduct.updateDate = moment().tz(tz).format();
-        oldProduct.category = categories.find(category => category.id === values.category);
-      }
-    });
-    modifyProduct(products);
+    modifyProduct(values,product,newPrice,category);
     handleClose();
   }
 

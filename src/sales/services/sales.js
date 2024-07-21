@@ -6,7 +6,7 @@ export async function getProducts(token) {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       mode: 'cors'
     };
-    const response = await fetch(`${API_URL}/products`, requestOptions);
+    const response = await fetch(`${API_URL}/products/byCategory`, requestOptions);
     const data = await response.json();
     return data;
 }
