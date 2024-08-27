@@ -91,3 +91,14 @@ export async function deliverOrder(token, orderId, date) {
     const data = await response.json();
     return data;
 }
+
+export async function getUnpaidOrders(token) {
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors'
+    };
+    const response = await fetch(`${API_URL}/orders/unpaid/all`, requestOptions);
+    const data = await response.json();
+    return data;
+}

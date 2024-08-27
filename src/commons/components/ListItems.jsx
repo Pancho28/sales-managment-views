@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { ListItemButton, ListItemIcon, ListItemText, List } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText, List, Tooltip } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import CreditScoreIcon from '@mui/icons-material/CreditScore';
 import { AccessNames } from "../helpers/enum.ts";
 
 export default function ListItems() {
@@ -28,42 +29,64 @@ export default function ListItems() {
 
 return(
     <List component="nav">
-      <ListItemButton component={RouterLink} to="/menu">
-        <ListItemIcon>
-          <PointOfSaleIcon />
-        </ListItemIcon>
-        <ListItemText primary="Ventas" />
-      </ListItemButton>
-      <ListItemButton component={RouterLink} to="/menu/precios">
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary="Precios" />
-      </ListItemButton>
+      <Tooltip title="Ventas">
+        <ListItemButton component={RouterLink} to="/menu">
+          <ListItemIcon>
+            <PointOfSaleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Ventas" />
+        </ListItemButton>
+      </Tooltip>
+      <Tooltip title="Precios">
+        <ListItemButton component={RouterLink} to="/menu/precios">
+          <ListItemIcon>
+            <DashboardIcon />
+          </ListItemIcon>
+          <ListItemText primary="Precios" />
+        </ListItemButton>
+      </Tooltip>
       { accessList && accessList.includes(AccessNames.OPEN_ORDERS) &&
-      <ListItemButton component={RouterLink} to="/menu/orders">
-        <ListItemIcon>
-          <PendingActionsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Ordenes" />
-      </ListItemButton>
+      <Tooltip title="Por entregar">
+        <ListItemButton component={RouterLink} to="/menu/orders">
+          <ListItemIcon>
+            <PendingActionsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Por entregar" />
+        </ListItemButton>
+      </Tooltip>
       }
       { accessList && accessList.includes(AccessNames.TOTALS) &&
-      <ListItemButton component={RouterLink} to="/menu/totales">
-        <ListItemIcon>
-          <BarChartIcon />
-        </ListItemIcon>
-        <ListItemText primary="Totales" />
-      </ListItemButton>
+      <Tooltip title="Totales">
+        <ListItemButton component={RouterLink} to="/menu/totales">
+          <ListItemIcon>
+            <BarChartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Totales" />
+        </ListItemButton>
+      </Tooltip>
       }
       { accessList && accessList.includes(AccessNames.CLOSING) &&
-      <ListItemButton component={RouterLink} to="/menu/cierre">
-        <ListItemIcon>
-          <CurrencyExchangeIcon />
-        </ListItemIcon>
-        <ListItemText primary="Cierre" />
-      </ListItemButton>
+      <Tooltip title="Cierre">
+        <ListItemButton component={RouterLink} to="/menu/cierre">
+          <ListItemIcon>
+            <CurrencyExchangeIcon />
+          </ListItemIcon>
+          <ListItemText primary="Cierre" />
+        </ListItemButton>
+      </Tooltip>
       } 
+      {
+        accessList && accessList.includes(AccessNames.UNPAID) &&
+        <Tooltip title="Por cobrar">
+          <ListItemButton component={RouterLink} to="/menu/unpaid">
+            <ListItemIcon>
+              <CreditScoreIcon />
+            </ListItemIcon>
+            <ListItemText primary="Por cobrar" />
+          </ListItemButton>
+        </Tooltip>
+
+      }
     </List>
   );
 }

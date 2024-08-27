@@ -11,7 +11,7 @@ import { enqueueSnackbar } from 'notistack';
 import { deliverOrder, getOrdersNotDelivered } from "../services/sales";
 
 
-export default function Orders() {
+export default function NotDeliveredOrders() {
 
   const navigate = useNavigate();
 
@@ -71,7 +71,7 @@ export default function Orders() {
           <Accordion key={order.id}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="h6">
-                Orden pendiente {moment(order.creationDate).format('h:mm a')}  
+                Orden pendiente desde {moment(order.creationDate).format('h:mm a')}  
               </Typography>
               <AccessTimeIcon color='primary' fontSize='inherit' /> 
             </AccordionSummary>
