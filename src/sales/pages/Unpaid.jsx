@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Typography, Paper, Stack, Accordion, AccordionActions, AccordionSummary, AccordionDetails, Button, List,
-  ListItem, ListItemIcon, ListItemText, Box,
-  Grid} from '@mui/material';
+  ListItem, ListItemIcon, ListItemText, Box, Grid} from '@mui/material';
+import { DialogPay } from "../components";
+import useProducts from "../../commons/hooks/useProducts";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
@@ -10,7 +11,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import PersonPinIcon from '@mui/icons-material/PersonPin';
 import moment from "moment-timezone";
 import { enqueueSnackbar } from 'notistack';
-import { getUnpaidOrders } from "../services/sales";
+import { getUnpaidOrders, paidOrder } from "../services/sales";
 
 
 export default function Unpaid() {
@@ -21,13 +22,18 @@ export default function Unpaid() {
 
   const [total, setTotal] = useState(0);
 
-  const payOrder = async (orderId) => {
-    const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
-    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
-    const newOrders = orders.filter(order => order.id !== orderId);
-    setOrders(newOrders);
-    calculateTotal(newOrders);
-    console.log(orderId,token,tz);
+  const [orderId, setOrderId] = useState(0);
+
+  const [totalOrder, setTotalOrder] = useState(0);
+
+  const [open, setOpen] = useState(false);
+
+  const { paymentTypes } = useProducts();
+
+  const payOrder = async (id,total) => {
+    setOrderId(id);
+    setTotalOrder(Number(total));
+    setOpen(!open);
   }
 
   const calculateTotal = (orders) => {
@@ -35,8 +41,38 @@ export default function Unpaid() {
     orders.forEach((order) => {
       total += Number(order.totalDl);
     });
-    console.log(total)
     setTotal(total);
+  }
+
+  const completeOrder = async (data) => {
+    const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
+    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
+    data.forEach(async (payment) => {
+      delete payment.isPaid;
+    });
+    const newPaidOrder = {
+      date: moment().tz(tz).format(),
+      payments: data,
+    }
+    try{
+      const response = await paidOrder(token, orderId, newPaidOrder);
+      if (response.statusCode === 201){
+        enqueueSnackbar('Orden pagada con éxito',{ variant: 'success' });
+        const newOrders = orders.filter(order => order.id !== orderId);
+        setOrders(newOrders);
+        calculateTotal(newOrders);
+      }else if(response.statusCode === 401){
+        sessionStorage.clear();
+        navigate('/', { replace: true });
+        enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+      }else{
+        enqueueSnackbar(response.message,{ variant: 'error' });
+        return
+      }
+    }
+    catch (error) {
+      enqueueSnackbar('Error al pagar la orden',{ variant: 'error' });
+    }
   }
 
   useEffect(() => {
@@ -44,7 +80,6 @@ export default function Unpaid() {
       try{
         const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
         const ordersResponse = await getUnpaidOrders(token);
-        console.log(ordersResponse.orders);
         if (ordersResponse.statusCode === 200){
           setOrders(ordersResponse.orders);
           calculateTotal(ordersResponse.orders);
@@ -66,9 +101,8 @@ export default function Unpaid() {
   return (
     <Paper>
       <Stack>
-        <Typography gutterBottom variant="h4" p={2}>Ordenes no pagadas: {orders.length}</Typography>
         {
-          total > 0 && <Typography gutterBottom variant="h4" p={2}>Total no pagado: {total}</Typography>
+          total > 0 && <Typography gutterBottom variant="h4" p={2}> {orders.length} orden(es) no pagadas, {total}$ por cobrar</Typography>
         }
         { 
         orders && orders.length > 0 ? orders.map((order) => (
@@ -106,14 +140,18 @@ export default function Unpaid() {
               <Typography mt={3} ariant="subtitle2">Por pagar {order.totalDl}$ | {order.totalBs}Bs</Typography>
             </AccordionDetails>
             <AccordionActions>
-              <Button size="large" onClick={() => payOrder(order.id)}>Pagar pedido</Button>
+              <Button size="large" onClick={() => payOrder(order.id, order.totalDl)}>Pagar pedido</Button>
             </AccordionActions>
+            { open &&
+              <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} 
+              completeOrder={completeOrder} total={totalOrder} accessToOrders={null} withUnPaid={false}/>
+            }
           </Accordion>
         ))
         :
         <Box justifyContent="center" textAlign="center">
             <Typography p={2} variant="h4">
-            Sin ordenes por pagar
+            Sin ordenes por cobrar
             </Typography>
             <AddShoppingCartIcon fontSize='large'/>
         </Box>        

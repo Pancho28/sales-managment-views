@@ -9,9 +9,9 @@ import { LoadingButton } from '@mui/lab';
 import { FormProvider, RHFTextField, RHFSelect, RHFCheckbox } from '../../commons/hook-form';
 import { enqueueSnackbar } from 'notistack';
 
-export default function DialogPay({open, setOpen, paymentTypes, completeOrder, total, accessToOrders}) {
+export default function DialogPay({open, setOpen, paymentTypes, completeOrder, total, accessToOrders, withUnPaid}) {
 
-  const unPaidType = paymentTypes.find(type => type.name === 'Por pagar').id;
+  const unPaidType = paymentTypes.find(type => type.name === 'Por pagar').id ? paymentTypes.find(type => type.name === 'Por pagar').id : null;
 
   const paymentsNotUnPaid = paymentTypes.filter(type => type.id !== unPaidType);
 
@@ -121,7 +121,7 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
                       required
                       name="paymenType"
                       label="Tipo de pago"
-                      values={ payments === 1 ? paymentTypes : paymentsNotUnPaid}
+                      values={ (payments === 1 && withUnPaid) ? paymentTypes : paymentsNotUnPaid}
                     />
                   </Grid>
 

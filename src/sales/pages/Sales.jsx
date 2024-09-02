@@ -228,7 +228,7 @@ export default function Sales(){
         </Grid>
         {
             open && <DialogPay open={open} setOpen={setOpen} paymentTypes={paymentTypes} 
-                        completeOrder={completeOrder} total={total} accessToOrders={accessToOrders}/>
+                        completeOrder={completeOrder} total={total} accessToOrders={accessToOrders} withUnPaid={true}/>
         }
     </>
   );

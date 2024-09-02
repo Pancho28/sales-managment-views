@@ -102,3 +102,15 @@ export async function getUnpaidOrders(token) {
     const data = await response.json();
     return data;
 }
+
+export async function paidOrder(token, orderId, paidOrder) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors',
+      body: JSON.stringify(paidOrder)
+    };
+    const response = await fetch(`${API_URL}/orders/unpaid/${orderId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}
