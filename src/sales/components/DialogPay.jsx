@@ -11,7 +11,7 @@ import { enqueueSnackbar } from 'notistack';
 
 export default function DialogPay({open, setOpen, paymentTypes, completeOrder, total, accessToOrders, withUnPaid}) {
 
-  const unPaidType = paymentTypes.find(type => type.name === 'Por pagar').id ? paymentTypes.find(type => type.name === 'Por pagar').id : null;
+  const unPaidType = paymentTypes.find(type => type.name === 'Por pagar') ? paymentTypes.find(type => type.name === 'Por pagar').id : null;
 
   const paymentsNotUnPaid = paymentTypes.filter(type => type.id !== unPaidType);
 
