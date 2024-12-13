@@ -96,7 +96,7 @@ export default function Unpaid() {
       }
     }
     getOrders();
-  }, [navigate]);
+  }, []);
 
   return (
     <Paper>
