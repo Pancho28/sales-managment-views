@@ -56,7 +56,7 @@ export default function ListItems() {
       navigate('/', { replace: true });
       enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
     }
-  }, [navigate]);
+  }, [navigate,accessList]);
 
 return(
     <List component="nav">
