@@ -105,7 +105,7 @@ export default function Dashboard() {
       navigate('/', { replace: true });
       enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
     }
-  }, [navigate]);
+  }, []);
 
   return (
     <ThemeProvider theme={defaultTheme}>

@@ -143,7 +143,7 @@ export default function useProducts() {
         }
     }
     getData();
-    }, [navigate]);
+    }, []);
 
     return { products, paymentTypes, categories, accessToOrders, modifyProduct, addProduct };
 

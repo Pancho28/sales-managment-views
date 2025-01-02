@@ -8,7 +8,9 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import CreditScoreIcon from '@mui/icons-material/CreditScore';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { AccessNames } from "../helpers/enum.ts";
+import DialogPassword from './DialogPassword.jsx';
 
 export default function ListItems() {
 
@@ -16,16 +18,43 @@ export default function ListItems() {
 
   const [accessList, setAccessList] = useState([]);
 
+  const [accessVerify, setAccessVerify] = useState([]);
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const [password, setPassword] = useState('');
+
+  const [url, setUrl] = useState('');
+
+  const verifyAccess = (accesGranted) => {
+    if (accesGranted){
+      navigate(url);
+    }
+  }
+
+  const changeView = (url,name) => {
+    setUrl(url);
+    const access = accessVerify.find( acces => acces.name === name);
+    if (access.pass) {
+      setPassword(access.pass);
+      setOpenDialog(true);
+    }else {
+      navigate(url);
+    }
+  }
+
   useEffect(() => {
     const access = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')).access : null;
+    console.log(access);
     if (access){
       const accessNames = access.map( acces => acces.name );
-      setAccessList(accessNames)
+      setAccessList(accessNames);
+      setAccessVerify(access);
     }else {
       navigate('/', { replace: true });
       enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
     }
-  }, [navigate]);
+  }, []);
 
 return(
     <List component="nav">
@@ -47,46 +76,60 @@ return(
       </Tooltip>
       { accessList && accessList.includes(AccessNames.OPEN_ORDERS) &&
       <Tooltip title="Por entregar">
-        <ListItemButton component={RouterLink} to="/menu/orders">
+        <ListItemButton onClick={() => changeView("/menu/orders", AccessNames.OPEN_ORDERS)} >
           <ListItemIcon>
             <PendingActionsIcon />
           </ListItemIcon>
           <ListItemText primary="Por entregar" />
+          { accessVerify.find( acces => acces.name === AccessNames.OPEN_ORDERS).pass &&
+            <LockOutlinedIcon fontSize="small"/>
+          }
         </ListItemButton>
       </Tooltip>
       }
       { accessList && accessList.includes(AccessNames.TOTALS) &&
       <Tooltip title="Totales">
-        <ListItemButton component={RouterLink} to="/menu/totales">
+        <ListItemButton onClick={() => changeView("/menu/totales",AccessNames.TOTALS)}>
           <ListItemIcon>
             <BarChartIcon />
           </ListItemIcon>
-          <ListItemText primary="Totales" />
+          <ListItemText primary="Totales"/>
+          { accessVerify.find( acces => acces.name === AccessNames.TOTALS).pass &&
+            <LockOutlinedIcon fontSize="small"/>
+          }
         </ListItemButton>
       </Tooltip>
       }
       { accessList && accessList.includes(AccessNames.CLOSING) &&
       <Tooltip title="Cierre">
-        <ListItemButton component={RouterLink} to="/menu/cierre">
+        <ListItemButton onClick={() => changeView("/menu/cierre",AccessNames.CLOSING)}>
           <ListItemIcon>
             <CurrencyExchangeIcon />
           </ListItemIcon>
           <ListItemText primary="Cierre" />
+          { accessVerify.find( acces => acces.name === AccessNames.CLOSING).pass &&
+            <LockOutlinedIcon fontSize="small"/>
+          }
         </ListItemButton>
       </Tooltip>
       } 
       {
         accessList && accessList.includes(AccessNames.UNPAID) &&
         <Tooltip title="Por cobrar">
-          <ListItemButton component={RouterLink} to="/menu/unpaid">
+          <ListItemButton onClick={() => changeView("/menu/unpaid",AccessNames.UNPAID)}>
             <ListItemIcon>
               <CreditScoreIcon />
             </ListItemIcon>
             <ListItemText primary="Por cobrar" />
+          { accessVerify.find( acces => acces.name === AccessNames.UNPAID).pass &&
+            <LockOutlinedIcon fontSize="small"/>
+          }
           </ListItemButton>
         </Tooltip>
 
       }
+      { openDialog && <DialogPassword open={openDialog} setOpen={setOpenDialog} password={password} 
+                          verifyAccess={verifyAccess}/> }
     </List>
   );
 }
