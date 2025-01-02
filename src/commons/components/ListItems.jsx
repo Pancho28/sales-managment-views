@@ -16,7 +16,7 @@ export default function ListItems() {
 
   const navigate = useNavigate();
 
-  const [accessList, setAccessList] = useState([]);
+  const [accessList, setAccessList] = useState(null);
 
   const [accessVerify, setAccessVerify] = useState([]);
 
@@ -45,7 +45,9 @@ export default function ListItems() {
 
   useEffect(() => {
     const access = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')).access : null;
-    console.log(access);
+    if (accessList){
+      return;
+    }
     if (access){
       const accessNames = access.map( acces => acces.name );
       setAccessList(accessNames);
@@ -54,7 +56,7 @@ export default function ListItems() {
       navigate('/', { replace: true });
       enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
     }
-  }, []);
+  }, [navigate]);
 
 return(
     <List component="nav">
