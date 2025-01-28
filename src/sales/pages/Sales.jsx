@@ -203,6 +203,7 @@ export default function Sales(){
                                 <Grid container spacing={1}>
                                 {
                                     category.product.map((product)=>(
+                                        (product.status === 'ACTIVE') &&
                                         <Grid item xs={6} justifyContent="center" textAlign="center" key={product.id}>
                                             <Card>
                                             <CardActionArea onClick={() => addProduct(product)}>

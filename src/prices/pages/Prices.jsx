@@ -5,7 +5,7 @@ import { DialogModifyPrice, DialogAddProduct } from '../components';
 
 export default function Prices() {
 
-  const { products, categories, addProduct, modifyProduct } = useProducts();
+  const { products, categories, addProduct, modifyProduct, activateProduct, desactivateProduct } = useProducts();
 
   const [detailsProduct, setDetailsProduct] = useState({});
   
@@ -43,7 +43,7 @@ export default function Prices() {
         {products && products.map((category) => (
           category.product.map((product)=>(
           <Grid key={product.id} item xs={4} justifyContent="center" textAlign="center">
-            <Card>
+            <Card sx={{ opacity: product.status === 'ACTIVE' ? 1 : 0.5 }}>
             <CardActionArea onClick={ () => openDialogModify(product,category) }>
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
@@ -54,6 +54,9 @@ export default function Prices() {
                 </Typography>
                 <Typography gutterBottom variant="h6" component="div">
                   Categoria {category.name}
+                </Typography>
+                <Typography gutterBottom variant="h6" component="div">
+                  Estado {product.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Fecha de creacion {formatDate(product.creationDate)}
@@ -78,7 +81,8 @@ export default function Prices() {
         }
       </Grid>
       {openModify &&
-      <DialogModifyPrice open={openModify} setOpen={setOpenModify} category={detailsCategory} product={detailsProduct} setDetailsNull={setDetailsNull} products={products} modifyProduct={modifyProduct} categories={categories}/>
+      <DialogModifyPrice open={openModify} setOpen={setOpenModify} category={detailsCategory} product={detailsProduct} setDetailsNull={setDetailsNull} 
+        modifyProduct={modifyProduct} categories={categories} activate={activateProduct} desactivate={desactivateProduct}/>
       }
       {openAdd &&
       <DialogAddProduct open={openAdd} setOpen={setOpenAdd} addProduct={addProduct} categories={categories}/>

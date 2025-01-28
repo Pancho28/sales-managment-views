@@ -39,6 +39,32 @@ export default function useProducts() {
         sessionStorage.setItem('products', JSON.stringify(newProducts));
     }
 
+    const activateProduct = (productId) => {
+        const newProducts = [...products];
+        newProducts.forEach(category => {
+            category.product.forEach(product => {
+                if (product.id === productId){
+                    product.status = 'ACTIVE';
+                }
+            });
+        });
+        setProducts(newProducts);
+        sessionStorage.setItem('products', JSON.stringify(newProducts));
+    }
+
+    const desactivateProduct = (productId) => {
+        const newProducts = [...products];
+        newProducts.forEach(category => {
+            category.product.forEach(product => {
+                if (product.id === productId){
+                    product.status = 'INACTIVE';
+                }
+            });
+        });
+        setProducts(newProducts);
+        sessionStorage.setItem('products', JSON.stringify(newProducts));
+    }
+
     const modifyProduct = (newProduct, product, newPrice, category) => {
         const newProducts = [...products];
         const tz = JSON.parse(sessionStorage.getItem('data')).tz;
@@ -145,6 +171,6 @@ export default function useProducts() {
     getData();
     }, [navigate]);
 
-    return { products, paymentTypes, categories, accessToOrders, modifyProduct, addProduct };
+    return { products, paymentTypes, categories, accessToOrders, modifyProduct, addProduct, activateProduct, desactivateProduct };
 
 }
