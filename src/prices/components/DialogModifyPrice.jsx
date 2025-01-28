@@ -7,10 +7,10 @@ import { LoadingButton } from '@mui/lab';
 import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
-import { updateProduct } from "../services/prices";
+import { updateProduct, activateProduct, desactivateProduct } from "../services/prices";
 import moment from "moment-timezone";
 
-export default function DialogModifyPrice({open, setOpen, category, product, setDetailsNull, products, modifyProduct, categories}) {
+export default function DialogModifyPrice({open, setOpen, category, product, setDetailsNull, modifyProduct, categories, activate, desactivate}) {
 
   const dolarContext = useContext(DolarContext);
 
@@ -18,6 +18,24 @@ export default function DialogModifyPrice({open, setOpen, category, product, set
     setOpen(!open);
     setDetailsNull()
   };
+
+  const activeProduct = (prodcutId) => {
+    const token = dolarContext.dataContext.token;
+    const localId = dolarContext.dataContext.localId;
+    activateProduct(token,localId,prodcutId);
+    activate(prodcutId);
+    enqueueSnackbar('Producto activado',{ variant: 'success' });
+    handleClose();
+  }
+
+  const desactiveProduct = (prodcutId) => {
+    const token = dolarContext.dataContext.token;
+    const localId = dolarContext.dataContext.localId;
+    desactivateProduct(token,localId,prodcutId);
+    desactivate(prodcutId);
+    enqueueSnackbar('Producto desactivado',{ variant: 'success' });
+    handleClose();
+  }
 
   const RegisterSchema = Yup.object().shape({
     name: Yup.string().required('El tipo de pago es requerido'),
@@ -122,11 +140,21 @@ export default function DialogModifyPrice({open, setOpen, category, product, set
                   </Grid>
                 </Grid>
             </Box>
-            <Box sx={{ m: 2 }} justifyContent="end" textAlign="end">
-              <Button onClick={handleClose}>Cancelar</Button>
-              <LoadingButton sx={{ml: 1}} size="large" type="submit" variant="contained" loading={isSubmitting}>
-                Actualizar
-              </LoadingButton>
+            <Box sx={{ m: 2 }}>
+              <Box>
+                {
+                  product.status === 'ACTIVE' ?
+                  <Button color="secondary" onClick={() => desactiveProduct(product.id)} >Desactivar producto</Button>
+                  :
+                  <Button color="secondary" onClick={() =>  activeProduct(product.id)} >Activar producto</Button>
+                }
+              </Box>
+              <Box justifyContent="end" textAlign="end">
+                <Button onClick={handleClose}>Cancelar</Button>
+                <LoadingButton sx={{ml: 1}} size="large" type="submit" variant="contained" loading={isSubmitting}>
+                  Actualizar
+                </LoadingButton>
+              </Box>
             </Box>
           </FormProvider>
         </DialogContent>
