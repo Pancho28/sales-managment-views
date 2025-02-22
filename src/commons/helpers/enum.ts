@@ -4,3 +4,8 @@ export enum AccessNames {
     OPEN_ORDERS = 'Open orders',
     UNPAID = 'Unpaid Orders',
 } 
+
+export enum Status {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE'
+}
