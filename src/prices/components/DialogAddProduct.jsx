@@ -8,6 +8,7 @@ import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { createProduct } from "../services/prices";
+import { Status } from "../../commons/helpers/enum.ts";
 import moment from "moment-timezone";
 
 export default function DialogAddProduct({open, setOpen, addProduct, categories}) {
@@ -53,6 +54,7 @@ export default function DialogAddProduct({open, setOpen, addProduct, categories}
         price: parseFloat(values.price),
         creationDate: moment().tz(tz).format(),
         categoryId: values.category,
+        status: Status.ACTIVE,
         localId
       } 
       const token = dolarContext.dataContext.token;
