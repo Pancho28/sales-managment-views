@@ -9,6 +9,7 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import CreditScoreIcon from '@mui/icons-material/CreditScore';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import AttributionIcon from '@mui/icons-material/Attribution';
 import { AccessNames } from "../helpers/enum.ts";
 import DialogPassword from './DialogPassword.jsx';
 
@@ -129,6 +130,20 @@ return(
           </ListItemButton>
         </Tooltip>
 
+      }
+      {
+        accessList && accessList.includes(AccessNames.FOR_EMPLOYEE) &&
+        <Tooltip title="Empleados">
+          <ListItemButton onClick={() => changeView("/menu/foremployee",AccessNames.FOR_EMPLOYEE)}>
+            <ListItemIcon>
+              <AttributionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Empleados" />
+          { accessVerify.find( acces => acces.name === AccessNames.FOR_EMPLOYEE).pass &&
+            <LockOutlinedIcon fontSize="small"/>
+          }
+          </ListItemButton>
+        </Tooltip>
       }
       { openDialog && <DialogPassword open={openDialog} setOpen={setOpenDialog} password={password} 
                           verifyAccess={verifyAccess}/> }

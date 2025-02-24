@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { NotFoundPage } from "../pages";
-import { Sales, Totals, Accounting, NotDeliveredOrders, Unpaid } from "../../sales/pages";
+import { Sales, Totals, Accounting, NotDeliveredOrders, Unpaid, ForEmployee } from "../../sales/pages";
 import { Prices } from "../../prices/pages";
 
 // ----------------------------------------------------------------------
@@ -14,6 +14,7 @@ export default function MenuRoutes() {
       <Route path="/totales" element={<Totals/>} />
       <Route path="/cierre" element={<Accounting/>} />
       <Route path="/unpaid" element={<Unpaid/>} />
+      <Route path="/foremployee" element={<ForEmployee/>} />
       <Route path="*" element={<NotFoundPage/>} />
     </Routes>
     ); 

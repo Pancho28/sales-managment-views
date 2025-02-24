@@ -76,7 +76,7 @@ export default function Accounting() {
           <TableBody>
             {totals && totals.map((total) => (
               <TableRow key={total.name+total.currency}>
-                <TableCell>{total.name+' '+total.currency}</TableCell>
+                <TableCell>{(total.name+' '+total.currency).replace(/(\b\w+\b)\s+\1/, "$1")}</TableCell>
                 { total.currency === 'Bolivares' ?
                 <TableCell colSpan={2} align="right">{total.total * dolarContext.dataContext.dolar}Bs </TableCell>
                 :

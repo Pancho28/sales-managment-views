@@ -8,12 +8,15 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { LoadingButton } from '@mui/lab';
 import { FormProvider, RHFTextField, RHFSelect, RHFCheckbox } from '../../commons/hook-form';
 import { enqueueSnackbar } from 'notistack';
+import { SpecialPayments } from "../../commons/helpers/enum.ts";
 
 export default function DialogPay({open, setOpen, paymentTypes, completeOrder, total, accessToOrders, withUnPaid}) {
 
-  const unPaidType = paymentTypes.find(type => type.name === 'Por pagar') ? paymentTypes.find(type => type.name === 'Por pagar').id : null;
+  const unPaidType = paymentTypes.find(type => type.name === SpecialPayments.UNPAID) ? paymentTypes.find(type => type.name === SpecialPayments.UNPAID).id : null;
 
-  const paymentsNotUnPaid = paymentTypes.filter(type => type.id !== unPaidType);
+  const forEmployeePaidType = paymentTypes.find(type => type.name === SpecialPayments.FOREMPLOYEE) ? paymentTypes.find(type => type.name === SpecialPayments.FOREMPLOYEE).id : null;
+
+  const paymentsNotMultiPay = paymentTypes.filter(type => (type.id !== unPaidType && type.id !== forEmployeePaidType));
 
   const [payments, setPayments] = useState(1);
 
@@ -61,8 +64,8 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
 
   const onSubmit = async (values) => {
     let payment;
-    if (payments === 1 || values.paymenType === unPaidType){
-      payment = [{paymentTypeId: values.paymenType, amount: total, isPaid: values.paymenType === unPaidType ? false : true}]
+    if (payments === 1 || values.paymenType === unPaidType || values.paymenType === forEmployeePaidType){
+      payment = [{paymentTypeId: values.paymenType, amount: total, isPaid: (values.paymenType === unPaidType || values.paymenType === forEmployeePaidType) ? false : true}]
       if (values.paymenType === unPaidType){
         payment[0].customer = {name: values.firstName , lastName: values.lastName !== '' ? values.lastName : null}
       }
@@ -100,7 +103,7 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
           <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
             { payments === 1 ?
             <Tooltip title="Agregar pago">
-              <IconButton color="primary" size="large" onClick={addPayment} disabled={methods.watch('paymenType') === unPaidType}> 
+              <IconButton color="primary" size="large" onClick={addPayment} disabled={methods.watch('paymenType') === unPaidType || methods.watch('paymenType') === forEmployeePaidType}> 
                 <AddCircleIcon />
               </IconButton>
             </Tooltip>
@@ -121,11 +124,11 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
                       required
                       name="paymenType"
                       label="Tipo de pago"
-                      values={ (payments === 1 && withUnPaid) ? paymentTypes : paymentsNotUnPaid}
+                      values={ (payments === 1 && withUnPaid) ? paymentTypes : paymentsNotMultiPay}
                     />
                   </Grid>
 
-                  { payments > 1 && methods.watch('paymenType') !== unPaidType &&
+                  { payments > 1 && methods.watch('paymenType') !== unPaidType && methods.watch('paymenType') !== forEmployeePaidType &&
                   <>
                     <Grid item xs={5}>
                       <RHFTextField
@@ -140,7 +143,7 @@ export default function DialogPay({open, setOpen, paymentTypes, completeOrder, t
                       required
                       name="paymenType2"
                       label="Tipo de pago"
-                      values={paymentsNotUnPaid}
+                      values={paymentsNotMultiPay}
                     />
                     </Grid>
                     <Grid item xs={5}>
