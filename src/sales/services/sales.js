@@ -6,7 +6,7 @@ export async function getProducts(token) {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       mode: 'cors'
     };
-    const response = await fetch(`${API_URL}/products`, requestOptions);
+    const response = await fetch(`${API_URL}/products/byCategory`, requestOptions);
     const data = await response.json();
     return data;
 }
@@ -88,6 +88,41 @@ export async function deliverOrder(token, orderId, date) {
       body: JSON.stringify(date)
     };
     const response = await fetch(`${API_URL}/orders/notdelivered/${orderId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function getUnpaidOrders(token) {
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors'
+    };
+    const response = await fetch(`${API_URL}/orders/unpaid/all`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function paidOrder(token, orderId, paidOrder) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors',
+      body: JSON.stringify(paidOrder)
+    };
+    const response = await fetch(`${API_URL}/orders/unpaid/${orderId}`, requestOptions);
+    const data = await response.json();
+    return data;
+}
+
+export async function getSummaryForEmployee(token, localId, date) {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      mode: 'cors',
+      body: JSON.stringify(date)
+    };
+    const response = await fetch(`${API_URL}/products/summaryForEmployee/${localId}`, requestOptions);
     const data = await response.json();
     return data;
 }

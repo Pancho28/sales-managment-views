@@ -92,6 +92,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     const data = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')) : null;
+    if (Object.keys(dataContext).length !== 0){
+      return;
+    }
     if (data){
       setDataContext({
         dolar: data.local ? data.local.dolar : 0,
@@ -105,7 +108,7 @@ export default function Dashboard() {
       navigate('/', { replace: true });
       enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
     }
-  }, [navigate]);
+  }, [navigate,dataContext]);
 
   return (
     <ThemeProvider theme={defaultTheme}>

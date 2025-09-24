@@ -5,16 +5,24 @@ import { DialogModifyPrice, DialogAddProduct } from '../components';
 
 export default function Prices() {
 
-  const { products, categories, addProduct, modifyProduct } = useProducts();
+  const { products, categories, addProduct, modifyProduct, activateProduct, desactivateProduct } = useProducts();
 
   const [detailsProduct, setDetailsProduct] = useState({});
+  
+  const [detailsCategory, setDetailsCategory] = useState({});
 
   const [openModify, setOpenModify] = useState(false);
 
   const [openAdd, setOpenAdd] = useState(false);
 
-  const openDialogModify = (product) => { 
+  const setDetailsNull = () => {
+    setDetailsProduct({});
+    setDetailsCategory({});
+  }
+
+  const openDialogModify = (product,category) => { 
     setDetailsProduct(product);
+    setDetailsCategory(category);
     setOpenModify(!openModify);
   }
 
@@ -32,43 +40,49 @@ export default function Prices() {
         <Button onClick={openDialogAdd} >Agregar producto</Button>
       </Box>
       <Grid container spacing={2}>
-        {products && products.map((product) => (
-        <Grid key={product.id} item xs={4} justifyContent="center" textAlign="center">
-          <Card>
-          <CardActionArea onClick={ () => openDialogModify(product) }>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                {product.name}
-              </Typography>
-              <Typography gutterBottom variant="h6" component="div">
-                Precio {product.price}$
-              </Typography>
-              <Typography gutterBottom variant="h6" component="div">
-                Categoria {product.category.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Fecha de creacion {formatDate(product.creationDate)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {product.updateDate ?
-                <>
-                  Fecha de actualizacion {formatDate(product.updateDate)}
-                </>
-                :
-                <>
-                  Producto sin actualizaciones
-                </>
-                }
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-          </Card>
-        </Grid>
+        {products && products.map((category) => (
+          category.product.map((product)=>(
+          <Grid key={product.id} item xs={4} justifyContent="center" textAlign="center">
+            <Card sx={{ opacity: product.status === 'ACTIVE' ? 1 : 0.5 }}>
+            <CardActionArea onClick={ () => openDialogModify(product,category) }>
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="div">
+                  {product.name}
+                </Typography>
+                <Typography gutterBottom variant="h6" component="div">
+                  Precio {product.price}$
+                </Typography>
+                <Typography gutterBottom variant="h6" component="div">
+                  Categoria {category.name}
+                </Typography>
+                <Typography gutterBottom variant="h6" component="div">
+                  Estado {product.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Fecha de creacion {formatDate(product.creationDate)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {product.updateDate ?
+                  <>
+                    Fecha de actualizacion {formatDate(product.updateDate)}
+                  </>
+                  :
+                  <>
+                    Producto sin actualizaciones
+                  </>
+                  }
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+            </Card>
+          </Grid>
+          ))
         ))
         }
       </Grid>
       {openModify &&
-      <DialogModifyPrice open={openModify} setOpen={setOpenModify} product={detailsProduct} setDetailsProduct={setDetailsProduct} products={products} modifyProduct={modifyProduct} categories={categories}/>
+      <DialogModifyPrice open={openModify} setOpen={setOpenModify} category={detailsCategory} product={detailsProduct} setDetailsNull={setDetailsNull} 
+        modifyProduct={modifyProduct} categories={categories} activate={activateProduct} desactivate={desactivateProduct}/>
       }
       {openAdd &&
       <DialogAddProduct open={openAdd} setOpen={setOpenAdd} addProduct={addProduct} categories={categories}/>
