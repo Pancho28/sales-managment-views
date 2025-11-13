@@ -1,16 +1,14 @@
-import { useState, useEffect, createContext } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar ,Typography,
   Divider, IconButton, Container, AppBar as MuiAppBar, Tooltip } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import ListItems from './ListItems';
-import useLogout from '../../commons/hooks/useLogout'
-import MenuRoutes from "../routes/MenuRoutes";
-import DialogDolar from "./DialogDolar";
-
-export const DolarContext = createContext(0);
+import { ListItemsAdmin } from '../components';
+import { enqueueSnackbar } from 'notistack';
+import AdminRoutes from '../../commons/routes/AdminRoutes';
 
 const drawerWidth = 240;
 
@@ -60,43 +58,22 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+export default function DashboardAdmin() {
 
-  const { logout } = useLogout();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-
-  const [local, setLocal] = useState('');
-
-  const [dataContext, setDataContext] = useState({});
-
-  const [openDialog, setOpenDialog] = useState(false);
   
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const setDolar = (dolar) => {
-    dataContext.dolar = dolar;
-    const data = JSON.parse(sessionStorage.getItem('data'));
-    data.local.dolar = dolar;
-    sessionStorage.setItem('data', JSON.stringify(data));
+  const logout = () => {
+    sessionStorage.clear();
+    navigate('/', { replace: true });
+    enqueueSnackbar('Sesión cerrada',{ variant: 'success' });
   }
 
-  useEffect(() => {
-    const data = JSON.parse(sessionStorage.getItem('data')) ? JSON.parse(sessionStorage.getItem('data')) : null;
-    if (data){
-      setDataContext({
-        dolar: data.local ? data.local.dolar : 0,
-        userId: data.id,
-        localId: data.local ? data.local.id : null,
-        token: data.accessToken
-      });
-      setLocal(data.local);
-    }else {
-      logout();
-    }
-  }, [logout,dataContext]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -105,7 +82,7 @@ export default function Dashboard() {
         <AppBar position="absolute" open={open}>
           <Toolbar
             sx={{
-              pr: '24px', // keep right padding when drawer closed
+              pr: '24px'
             }}
           >
             <IconButton
@@ -127,15 +104,8 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard { local && local.name.toUpperCase()}
+              Administrator Dashboard
             </Typography>
-            <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
-              <Tooltip title="Precio dolar">
-                <Typography variant="subtitle1">
-                  {dataContext && dataContext.dolar}$
-                </Typography>
-              </Tooltip>
-            </IconButton>
             <IconButton color="inherit" onClick={logout}>
               <Tooltip title="Salir">
                 <ExitToAppIcon />
@@ -157,7 +127,7 @@ export default function Dashboard() {
             </IconButton>
           </Toolbar>
           <Divider />
-           <ListItems/>
+           <ListItemsAdmin/>
         </Drawer>
         <Box
           component="main"
@@ -173,15 +143,11 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="xlg" sx={{ mt: 4, mb: 4 }}>
-            <DolarContext.Provider value={{dataContext}}>
-              <MenuRoutes/>
-            </DolarContext.Provider>
+           <AdminRoutes/>
           </Container>
         </Box>
       </Box>
-      {
-        openDialog && <DialogDolar open={openDialog} setOpen={setOpenDialog} dataContext={dataContext} setDolar={setDolar}/>
-      }
+
     </ThemeProvider>
   );
 }

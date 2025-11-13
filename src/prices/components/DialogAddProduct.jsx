@@ -9,11 +9,14 @@ import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { createProduct } from "../services/prices";
 import { Status } from "../../commons/helpers/enum.ts";
+import useLogout from '../../commons/hooks/useLogout';
 import moment from "moment-timezone";
 
 export default function DialogAddProduct({open, setOpen, addProduct, categories}) {
 
   const dolarContext = useContext(DolarContext);
+
+  const { logout } = useLogout();
 
   const handleClose = () => {
     setOpen(!open);
@@ -67,9 +70,7 @@ export default function DialogAddProduct({open, setOpen, addProduct, categories}
         handleClose();
         enqueueSnackbar(response.message,{ variant: 'success' });
       }else if (response.statusCode === 401){
-        sessionStorage.clear();
-        enqueueSnackbar(response.message,{ variant: 'warning' });
-        return
+        logout();
       }else {
         enqueueSnackbar(response.message, { variant: 'error' });
         return

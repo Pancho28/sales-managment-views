@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import { getSummaryForEmployee } from "../services/sales";
+import useLogout from '../../commons/hooks/useLogout';
 import moment from "moment-timezone";
 
 export default function ForEmployee() {
 
-  // states
-
   const [products, setProducts] = useState([]);
+
+  const { logout } = useLogout();
 
   useEffect(() => {
     const getData = async () => {
@@ -20,16 +21,13 @@ export default function ForEmployee() {
       if (response.statusCode === 200) {
         setProducts(response.summary);
       }else if (response.statusCode === 401){
-        sessionStorage.clear();
-        enqueueSnackbar(response.message,{ variant: 'warning' });
-        return
+        logout();
       } else {
         enqueueSnackbar(response.message,{ variant: 'error' });
-        return
       }
     }
     getData();
-  },[]);
+  },[logout]);
 
   return (
       <TableContainer component={Paper}>

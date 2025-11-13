@@ -4,8 +4,11 @@ import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { getSummaryByPrice } from "../services/sales";
 import moment from "moment-timezone";
+import useLogout from '../../commons/hooks/useLogout';
 
 export default function Totals() {
+
+  const { logout } = useLogout();
 
   // states
 
@@ -38,16 +41,14 @@ export default function Totals() {
         setProducts(response.summary);
         setTotal(calculoTotal(response.summary));
       }else if (response.statusCode === 401){
-        sessionStorage.clear();
-        enqueueSnackbar(response.message,{ variant: 'warning' });
-        return
+        logout();
       } else {
         enqueueSnackbar(response.message,{ variant: 'error' });
         return
       }
     }
     getData();
-  },[]);
+  },[logout]);
 
   return (
       <TableContainer component={Paper}>

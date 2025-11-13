@@ -1,9 +1,13 @@
 import AppRoutes from "./commons/routes/AppRoutes";
-
+import { TanStackProvider } from './pluggins/TanStackProvider.jsx';
 
 function App() {
   return (
-    <AppRoutes/>
+    <>
+      <TanStackProvider>
+        <AppRoutes/>
+      </TanStackProvider>
+    </>
   );
 }
 
