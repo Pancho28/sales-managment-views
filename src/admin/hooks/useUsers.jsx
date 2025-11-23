@@ -12,7 +12,6 @@ export default function useUsers() {
         queryFn: async () => {
                 const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
                 const response = await getUsers(token);
-                console.log(response);
                 if (response.statusCode === 401){
                     logout();
                 } else if (response.statusCode !== 200) {

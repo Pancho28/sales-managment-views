@@ -96,7 +96,7 @@ export default function Dashboard() {
     }else {
       logout();
     }
-  }, [logout,dataContext]);
+  }, [logout]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -136,7 +136,7 @@ export default function Dashboard() {
                 </Typography>
               </Tooltip>
             </IconButton>
-            <IconButton color="inherit" onClick={logout}>
+            <IconButton color="inherit" onClick={() => logout(1)}>
               <Tooltip title="Salir">
                 <ExitToAppIcon />
               </Tooltip>

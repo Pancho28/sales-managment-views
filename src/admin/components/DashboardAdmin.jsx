@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useLogout from '../../commons/hooks/useLogout';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Drawer as MuiDrawer, Box, Toolbar ,Typography,
   Divider, IconButton, Container, AppBar as MuiAppBar, Tooltip } from '@mui/material';
@@ -7,7 +7,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { ListItemsAdmin } from '../components';
-import { enqueueSnackbar } from 'notistack';
 import AdminRoutes from '../../commons/routes/AdminRoutes';
 
 const drawerWidth = 240;
@@ -59,20 +58,14 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function DashboardAdmin() {
-
-  const navigate = useNavigate();
+  
+  const { logout } = useLogout();
 
   const [open, setOpen] = useState(false);
   
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
-  const logout = () => {
-    sessionStorage.clear();
-    navigate('/', { replace: true });
-    enqueueSnackbar('Sesión cerrada',{ variant: 'success' });
-  }
 
 
   return (
@@ -106,7 +99,7 @@ export default function DashboardAdmin() {
             >
               Administrator Dashboard
             </Typography>
-            <IconButton color="inherit" onClick={logout}>
+            <IconButton color="inherit" onClick={ ()=>logout(1)}>
               <Tooltip title="Salir">
                 <ExitToAppIcon />
               </Tooltip>

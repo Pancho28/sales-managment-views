@@ -4,34 +4,32 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import {Button, Grid, Dialog, Box, DialogContent, DialogTitle} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
-import { useUserMutationAdd } from "../hooks";
-import moment from "moment-timezone";
+import { useUserMutationModify } from "../hooks";
 import { timezones } from '../../commons/helpers/timezones.js';
+import { enqueueSnackbar } from 'notistack';
 
-export default function DialogAddUser({open, setOpen}) {
+export default function DialogModifyUser({open, setOpen, user}) {
 
-  const { mutation: userMutation } = useUserMutationAdd();
+  const { mutation: userMutation } = useUserMutationModify();
 
   const handleClose = () => {
     setOpen(!open);
   };
 
   const RegisterSchema = Yup.object().shape({
-    name: Yup.string().required('El nombre del usuario es requerido'),
-    password: Yup.string().required('La contraseña es requerida'),
-    local: Yup.string().required('El nombre del local es requerido'),
+    username: Yup.string().required('El nombre del usuario es requerido'),
+    localName: Yup.string().required('El nombre del local es requerido'),
     dolar: Yup.number().positive('El valor del dolar es requerido'),
     tz: Yup.string().required('La zona horaria es requerida'),
     email: Yup.string().email('El email debe ser válido'),
   });
 
   const defaultValues = {
-    name: '',
-    password: '',
-    local: '',
-    dolar: 0,
-    tz: '',
-    email: ''
+    username: user.username,
+    localName: user.local[0].name,
+    dolar: parseInt(user.local[0].dolar),
+    tz: user.tz,
+    email: user.email ? user.email : '',
   };
   
   const methods = useForm({
@@ -44,18 +42,29 @@ export default function DialogAddUser({open, setOpen}) {
     formState: { isSubmitting },
   } = methods;
 
+  // Verifica si se modifico algun campo
+  const verifyChanges = (values) => {
+    for (const key in values) {
+      if (values[key] !== defaultValues[key]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const onSubmit = (values) => {
-    const tz = JSON.parse(sessionStorage.getItem('data')).tz;
-    const token = JSON.parse(sessionStorage.getItem('data')).accessToken;
-    userMutation.mutate({
-        username: values.name,
-        password: values.password,
-        name: values.local,
+    const verify = verifyChanges(values);
+    if (!verify) {
+      enqueueSnackbar('No se realizaron cambios en el usuario', { variant: 'warning' });
+      return;
+    }
+    userMutation.mutate({ 
+        username: values.username,
+        localName: values.localName,
         dolar: parseFloat(values.dolar),
         tz: values.tz,
         email: values.email === '' ? null : values.email,
-        creationDate: moment().tz(tz).format(),
-        token,
+        userId: user.id,
     });
     handleClose();
   }
@@ -74,7 +83,7 @@ export default function DialogAddUser({open, setOpen}) {
 
                   <Grid item xs={12}>
                     <RHFTextField
-                      name="name"
+                      name="username"
                       label="Nombre del usuario"
                     />
                   </Grid>
@@ -86,13 +95,7 @@ export default function DialogAddUser({open, setOpen}) {
                   </Grid>
                   <Grid item xs={12}>
                     <RHFTextField
-                      name="password"
-                      label="Contraseña"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <RHFTextField
-                      name="local"
+                      name="localName"
                       label="Nombre del local"
                     />
                   </Grid>
@@ -115,7 +118,7 @@ export default function DialogAddUser({open, setOpen}) {
             <Box sx={{ m: 2 }} justifyContent="end" textAlign="end">
               <Button onClick={handleClose}>Cancelar</Button>
               <LoadingButton sx={{ml: 1}} size="large" type="submit" variant="contained" loading={isSubmitting}>
-                Crear
+                Actualizar
               </LoadingButton>
             </Box>
           </FormProvider>

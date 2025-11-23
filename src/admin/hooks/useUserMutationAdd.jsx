@@ -3,7 +3,7 @@ import { createUser } from '../services/admin.js';
 import { enqueueSnackbar } from 'notistack';
 import useLogout from "../../commons/hooks/useLogout.jsx";
 
-export default function useUserMutation() {
+export default function useUserMutationAdd() {
 
     const { logout } = useLogout();
 
@@ -30,7 +30,8 @@ export default function useUserMutation() {
                     // si hay usuarios, agrega el nuevo al array existente
                     return [...oldUsers, user]
                 }
-            )
+            );
+            enqueueSnackbar('Usuario creado con éxito',{ variant: 'success' });
         },
         onError: (error) => {
             enqueueSnackbar(error.message,{ variant: 'error' });
