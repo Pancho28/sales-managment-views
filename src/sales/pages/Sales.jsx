@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useProducts from "../../commons/hooks/useProducts";
 import { Paper, Grid, Card, CardActionArea, CardContent, Typography, Stack, 
         IconButton, Button, Accordion, AccordionSummary, AccordionDetails, 
@@ -14,8 +13,11 @@ import { enqueueSnackbar } from 'notistack';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { createOrder } from "../services/sales";
 import moment from "moment-timezone";
+import useLogout from '../../commons/hooks/useLogout';
 
 export default function Sales(){
+
+    const { logout } = useLogout();
 
     const [total, setTotal] = useState(0);
 
@@ -28,8 +30,6 @@ export default function Sales(){
     const dolarContext = useContext(DolarContext);
 
     const { products, paymentTypes, accessToOrders } = useProducts();
-
-    const navigate = useNavigate();
 
     const calculateTotal = () => {
         let total = 0;
@@ -99,10 +99,7 @@ export default function Sales(){
                 setOrder([]);
                 setTotal(0);
             }else if(response.statusCode === 401){
-                sessionStorage.clear();
-                navigate('/', { replace: true });
-                enqueueSnackbar(response.message,{ variant: 'warning' });
-                return
+                logout();
             }else {
                 enqueueSnackbar(response.message, { variant: 'error' });
                 return

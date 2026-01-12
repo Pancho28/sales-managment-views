@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useLogout from './useLogout.jsx';
 import { enqueueSnackbar } from 'notistack';
 import { getPaymentsTypes, getProducts, getCategories } from "../../sales/services/sales";
 import { AccessNames } from "../helpers/enum.ts";
+import { Status } from '../helpers/enum.ts';
 import moment from "moment-timezone";
 
 export default function useProducts() {
-
-    const navigate = useNavigate();
 
     const [products, setProducts] = useState([]);
 
@@ -16,6 +15,8 @@ export default function useProducts() {
     const [categories, setCategories] = useState([]);
 
     const [accessToOrders, setAccessToOrders] = useState();
+
+    const { logout } = useLogout();
 
     const addProduct = (newProduct) => {
         const newProducts = [...products];
@@ -75,6 +76,7 @@ export default function useProducts() {
                 if (oldProduct.id === product.id){
                   oldProduct.name = newProduct.name;
                   oldProduct.price = newPrice;
+                  oldProduct.status = Status.ACTIVE;
                   oldProduct.updateDate = moment().tz(tz).format();
                 }
               })
@@ -82,30 +84,36 @@ export default function useProducts() {
           });
         }else {
           const existCategory = products.find(category => category.id === newProduct.category);
-          if (existCategory){ //Si el producto se va a otra categoria y en esa categoria se tienen productos
+          if (existCategory){ // Si el producto se va a otra categoria y en esa categoria se tienen productos
             products.forEach((oldCategory) => {
-              if (oldCategory.id === category.id){
+              if (oldCategory.id === category.id){ // Para eliminar el producto de la categoria antigua
                 category.product.forEach((oldProduct) => {
                   if (oldProduct.id === product.id){
                     category.product.splice(category.product.indexOf(oldProduct),1);
                   }
                 })
               }
-              if (oldCategory.id === newProduct.category){
+              if (oldCategory.id === newProduct.category){ // Para agregar el producto a la nueva categoria
                 oldCategory.product.push({id: product.id, name: newProduct.name, 
                                           price: newPrice, 
-                                          creationDate: product.creationDate, 
+                                          creationDate: product.creationDate,
+                                          status: Status.ACTIVE,
                                           updateDate: moment().tz(tz).format()
                                         });
               }
             });
-          }else { //Si el producto se va a otra categoria y en esa categoria no se tienen productos
+          }else { // Si el producto se va a otra categoria y en esa categoria no se tienen productos
             const newCategory = {
               id: newProduct.category,
               name: categories.find(category => category.id === newProduct.category).name,
-              product: [{id: product.id, name: newProduct.name, price: newPrice, creationDate: product.creationDate, updateDate: moment().tz(tz).format()}]
+              product: [{id: product.id, 
+                        name: newProduct.name, 
+                        price: newPrice, 
+                        creationDate: product.creationDate,
+                        status: Status.ACTIVE, 
+                        updateDate: moment().tz(tz).format()}]
             }
-            products.forEach((oldCategory) => {
+            products.forEach((oldCategory) => { // Para eliminar el producto de la categoria antigua
               if (oldCategory.id === category.id){
                 category.product.forEach((oldProduct) => {
                   if (oldProduct.id === product.id){
@@ -158,9 +166,7 @@ export default function useProducts() {
                 setAccessToOrders(accessOrders);
             }else if(productsResponse.statusCode === 401 || paymentTypesResponse.statusCode === 401 
                     || categoriesResponse.statusCode === 401){
-                sessionStorage.clear();
-                navigate('/', { replace: true });
-                enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+                logout();
             }else{
                 enqueueSnackbar(productsResponse.message,{ variant: 'error' });
             }
@@ -169,8 +175,8 @@ export default function useProducts() {
         }
     }
     getData();
-    }, [navigate]);
+    }, [logout]);
 
-    return { products, paymentTypes, categories, accessToOrders, modifyProduct, addProduct, activateProduct, desactivateProduct };
+    return { products, paymentTypes, categories, accessToOrders, modifyProduct, addProduct, activateProduct, desactivateProduct, logout };
 
 }

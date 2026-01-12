@@ -22,6 +22,7 @@ import { FormProvider, RHFTextField } from '../../commons/hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { login } from "../services/authorization";
+import { Roles } from '../../commons/helpers/enum.ts';
 
 const defaultTheme = createTheme();
 
@@ -64,7 +65,12 @@ export default function SignIn() {
       }
       sessionStorage.setItem('data', JSON.stringify(response.data));
       enqueueSnackbar('Ingresando...',{ variant: 'success' });
-      navigate('/menu', { replace: true });
+      const userRole = response.data.role;
+      if (userRole === Roles.SELLER) {
+        navigate('/menu', { replace: true });
+      } else {
+        navigate('/admin', { replace: true });
+      }
     } catch (error) {
       enqueueSnackbar('Usuario o contraseña incorrectos',{ variant: 'error' });
     }
