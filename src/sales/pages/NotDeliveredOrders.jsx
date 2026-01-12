@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
 import { Typography, Paper, Stack, Accordion, AccordionActions, AccordionSummary, AccordionDetails, Button, List,
   ListItem, ListItemIcon, ListItemText, Box} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -9,11 +8,12 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import moment from "moment-timezone";
 import { enqueueSnackbar } from 'notistack';
 import { deliverOrder, getOrdersNotDelivered } from "../services/sales";
+import useLogout from "../../commons/hooks/useLogout";
 
 
 export default function NotDeliveredOrders() {
 
-  const navigate = useNavigate();
+  const { logout } = useLogout();
 
   const [orders, setOrders] = useState([]);
 
@@ -28,9 +28,7 @@ export default function NotDeliveredOrders() {
         setOrders(newOrders);
         enqueueSnackbar(response.message,{ variant: 'success' });
       }else if (response.statusCode === 401){
-        sessionStorage.clear();
-        enqueueSnackbar(response.message,{ variant: 'warning' });
-        return
+        logout();
       }else {
         enqueueSnackbar(response.message, { variant: 'error' });
         return
@@ -49,9 +47,7 @@ export default function NotDeliveredOrders() {
         if (ordersResponse.statusCode === 200){
           setOrders(ordersResponse.orders);
         }else if(ordersResponse.statusCode === 401){
-          sessionStorage.clear();
-          navigate('/', { replace: true });
-          enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+          logout();
         }else{
           enqueueSnackbar(ordersResponse.message,{ variant: 'error' });
         }
@@ -61,7 +57,7 @@ export default function NotDeliveredOrders() {
       }
     }
     getOrders();
-  }, [navigate]);
+  }, [logout]);
 
   return (
     <Paper>

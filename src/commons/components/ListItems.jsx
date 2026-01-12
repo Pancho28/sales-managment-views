@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { ListItemButton, ListItemIcon, ListItemText, List, Tooltip } from '@mui/material';
-import { enqueueSnackbar } from 'notistack';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -12,10 +11,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AttributionIcon from '@mui/icons-material/Attribution';
 import { AccessNames } from "../helpers/enum.ts";
 import DialogPassword from './DialogPassword.jsx';
+import useLogout from '../hooks/useLogout';
 
 export default function ListItems() {
 
   const navigate = useNavigate();
+
+  const { logout } = useLogout();
 
   const [accessList, setAccessList] = useState(null);
 
@@ -54,10 +56,9 @@ export default function ListItems() {
       setAccessList(accessNames);
       setAccessVerify(access);
     }else {
-      navigate('/', { replace: true });
-      enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+      logout();
     }
-  }, [navigate,accessList]);
+  }, [logout,accessList]);
 
 return(
     <List component="nav">

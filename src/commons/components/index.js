@@ -5,3 +5,4 @@ export { default as Footer } from './Footer';
 export { default as Iconify } from './Iconify';
 export { default as ListItems } from './ListItems';
 export { default as NotFound } from './NotFound';
+export { default as SkeletonTable } from './SkeletonTable';

@@ -32,7 +32,7 @@ export default function NotFoundView() {
             ¿Quizá ha escrito mal la URL? Asegúrese de revisar su ortografía.
           </Typography>
 
-          <Button size="large" variant="contained" onClick={()=> navigate('/menu', { replace: true })}>
+          <Button size="large" variant="contained" onClick={()=> navigate('/', { replace: true })}>
             Ir al menu principal
           </Button>
         </Box>

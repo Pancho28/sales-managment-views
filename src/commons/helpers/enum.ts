@@ -15,3 +15,8 @@ export enum SpecialPayments {
     UNPAID = 'Por pagar',
     FOREMPLOYEE = 'Para empleado'
 }
+
+export enum Roles {
+    ADMIN = 'ADMIN',
+    SELLER = 'SELLER'
+}

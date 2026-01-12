@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom';
 import {Button, TextField , Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import { updateDolar } from "../services/commons";
+import useLogout from '../hooks/useLogout';
 
 export default function DialogDolar({open, setOpen, dataContext, setDolar}) {
 
-  const navigate = useNavigate();
+  const { logout } = useLogout();
 
   const handleClose = () => {
     setOpen(!open);
@@ -28,10 +28,7 @@ export default function DialogDolar({open, setOpen, dataContext, setDolar}) {
         handleClose();
         enqueueSnackbar(response.message,{ variant: 'success' });
       }else if(response.statusCode === 401){
-        sessionStorage.clear();
-        navigate('/', { replace: true });
-        enqueueSnackbar(response.message,{ variant: 'warning' });
-        return
+        logout();
       }else {
         enqueueSnackbar(response.message, { variant: 'error' });
         return

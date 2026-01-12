@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
 import { Typography, Paper, Stack, Accordion, AccordionActions, AccordionSummary, AccordionDetails, Button, List,
   ListItem, ListItemIcon, ListItemText, Box, Grid} from '@mui/material';
 import { DialogPay } from "../components";
@@ -12,11 +11,12 @@ import PersonPinIcon from '@mui/icons-material/PersonPin';
 import moment from "moment-timezone";
 import { enqueueSnackbar } from 'notistack';
 import { getUnpaidOrders, paidOrder } from "../services/sales";
+import useLogout from "../../commons/hooks/useLogout";
 
 
 export default function Unpaid() {
 
-  const navigate = useNavigate();
+  const { logout } = useLogout();
 
   const [orders, setOrders] = useState([]);
 
@@ -62,9 +62,7 @@ export default function Unpaid() {
         setOrders(newOrders);
         calculateTotal(newOrders);
       }else if(response.statusCode === 401){
-        sessionStorage.clear();
-        navigate('/', { replace: true });
-        enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+        logout();
       }else{
         enqueueSnackbar(response.message,{ variant: 'error' });
         return
@@ -84,9 +82,7 @@ export default function Unpaid() {
           setOrders(ordersResponse.orders);
           calculateTotal(ordersResponse.orders);
         }else if(ordersResponse.statusCode === 401){
-          sessionStorage.clear();
-          navigate('/', { replace: true });
-          enqueueSnackbar('Vuelva a iniciar sesión',{ variant: 'warning' });
+          logout();
         }else{
           enqueueSnackbar(ordersResponse.message,{ variant: 'error' });
         }
@@ -96,7 +92,7 @@ export default function Unpaid() {
       }
     }
     getOrders();
-  }, [navigate]);
+  }, [logout]);
 
   return (
     <Paper>

@@ -8,11 +8,14 @@ import { FormProvider, RHFTextField, RHFSelect } from '../../commons/hook-form';
 import { DolarContext } from "../../commons/components/Dashboard";
 import { enqueueSnackbar } from 'notistack';
 import { updateProduct, activateProduct, desactivateProduct } from "../services/prices";
+import useLogout from "../../commons/hooks/useLogout";
 import moment from "moment-timezone";
 
 export default function DialogModifyPrice({open, setOpen, category, product, setDetailsNull, modifyProduct, categories, activate, desactivate}) {
 
   const dolarContext = useContext(DolarContext);
+
+  const { logout } = useLogout();
 
   const handleClose = () => {
     setOpen(!open);
@@ -68,16 +71,14 @@ export default function DialogModifyPrice({open, setOpen, category, product, set
       name: values.name === product.name ? null : values.name,
       price: parseFloat(values.price) === parseFloat(product.price) ? null : values.price,
       updateDate: moment().tz(tz).format(),
-      categoryId: values.category === category.id ? null : values.category,
+      categoryId: values.category === category.id ? null : values.category
     }
     try {
       const response = await updateProduct(token, newProduct, localId);
       if (response.statusCode === 201) {
         enqueueSnackbar(response.message,{ variant: 'success' });
       }else if (response.statusCode === 401){
-        sessionStorage.clear();
-        enqueueSnackbar(response.message,{ variant: 'warning' });
-        return
+        logout();
       }else {
         enqueueSnackbar(response.message, { variant: 'error' });
         return
