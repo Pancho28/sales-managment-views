@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useUsers, useUserMutationStatus } from '../hooks';
+import { useUsers, useUserMutationStatus, useAccessUser } from '../hooks';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, 
         IconButton, Typography, Button, Box, Chip, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { SkeletonTable } from '../../commons/components';
-import { DialogAddUser, DialogResetPassword, DialogModifyUser } from '.';
+import { DialogAddUser, DialogResetPassword, DialogModifyUser, DialogAccessUser } from '.';
 import { Status, Roles } from '../../commons/helpers/enum.ts';
 import moment from "moment-timezone";
 
@@ -18,6 +18,8 @@ export default function Users() {
   const [openResetPassword, setOpenResetPassword] = useState(false);
 
   const [openModify, setOpenModify] = useState(false);
+
+  const [openAccess, setOpenAccess] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -35,14 +37,20 @@ export default function Users() {
     setAnchorEl(null);
   };
 
-  const { isError, error, isLoading, data: users } = useUsers();
+  const { isError: isUsersError, error: usersError, isLoading: isUsersLoading, data: users } = useUsers();
 
-  if (isLoading) {
+  const { isError: isAccessError, error: accessError, data: accesses } = useAccessUser();
+
+  if (isUsersLoading) {
       return <SkeletonTable rows={6}/>
   }
 
-  if (isError) {
-      return <Typography>Error cargando usuarios: {error.message}</Typography>;
+  if (isUsersError) {
+      return <Typography>Error cargando usuarios: {usersError.message}</Typography>;
+  }
+
+  if (isAccessError) {
+      return <Typography>Error cargando accesos: {accessError.message}</Typography>;
   }
 
   const openDialogModification = () => {
@@ -67,7 +75,7 @@ export default function Users() {
   }
 
   const handlerAccess = () => {
-    console.log('Gestionar accesos');
+    setOpenAccess(!openAccess);
     handleCloseMoreOptions();
   };
 
@@ -150,6 +158,9 @@ export default function Users() {
       }
       {
         openModify && <DialogModifyUser open={openModify} setOpen={setOpenModify} user={selectedUser} />
+      }
+      {
+        openAccess && <DialogAccessUser open={openAccess} setOpen={setOpenAccess} access={accesses} userAccess={selectedUser.access} />
       }
     </>
   );

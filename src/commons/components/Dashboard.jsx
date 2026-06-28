@@ -129,18 +129,18 @@ export default function Dashboard() {
             >
               Dashboard { local && local.name.toUpperCase()}
             </Typography>
-            <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
-              <Tooltip title="Precio dolar">
+            <Tooltip title="Precio dolar">
+              <IconButton color="inherit" onClick={() => setOpenDialog(!openDialog)}>
                 <Typography variant="subtitle1">
                   {dataContext && dataContext.dolar}$
                 </Typography>
-              </Tooltip>
-            </IconButton>
-            <IconButton color="inherit" onClick={() => logout(1)}>
-              <Tooltip title="Salir">
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Salir">
+              <IconButton color="inherit" onClick={() => logout(1)}>
                 <ExitToAppIcon />
-              </Tooltip>
-            </IconButton>
+              </IconButton>
+            </Tooltip>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>

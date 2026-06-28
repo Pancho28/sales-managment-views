@@ -28,9 +28,11 @@ export default function RHFSelect({ name, values, onChangeCourseCode, defaultVal
       control={control}
       render={({ field  , fieldState: { error } }) => (
         <>
-            <InputLabel>{label}</InputLabel>
+            <InputLabel id={`${name}-label`}>{label}</InputLabel>
             <Select
               fullWidth
+              labelId={`${name}-label`}
+              id={name}
               label={label}
               {...field}              
               onChange={onChangeSelect}

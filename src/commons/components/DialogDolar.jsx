@@ -12,7 +12,7 @@ export default function DialogDolar({open, setOpen, dataContext, setDolar}) {
   };
 
   const handleAdd = async (dolar) => {
-    if (dolar === dataContext.dolar){
+    if (Number(dolar) === dataContext.dolar){
         enqueueSnackbar('No se ha modificado el valor del cambio',{ variant: 'warning' });
         return;
     }
